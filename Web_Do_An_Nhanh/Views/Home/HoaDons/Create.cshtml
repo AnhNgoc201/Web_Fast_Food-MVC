@@ -1,0 +1,381 @@
+﻿@model Web_Do_An_Nhanh.Models.HoaDon
+@using Web_Do_An_Nhanh.Models
+
+@{
+    ViewBag.Title = "Thêm hóa đơn";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    var sanPhams = ViewBag.SanPhams as IEnumerable<SanPham>;
+    bool phiShipChecked = Model != null && Model.PhiShip.HasValue ? Model.PhiShip.Value : false;
+}
+
+<div class="container py-4">
+
+    <h2 class="text-danger fw-bold mb-3">
+        <i class="fas fa-file-circle-plus me-2"></i> THÊM HÓA ĐƠN MỚI
+    </h2>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header fw-bold">
+                        Sản phẩm trong đơn
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small">
+                            Nhập số lượng (&gt; 0) cho các món cần thêm vào hóa đơn. Món có SL = 0 sẽ không tính.
+                        </p>
+
+                        <!-- Bộ lọc nâng cao -->
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <button class="btn btn-outline-secondary btn-sm"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#advancedFoodFilter"
+                                    aria-expanded="false"
+                                    aria-controls="advancedFoodFilter">
+                                <i class="fas fa-filter me-1"></i> Bộ lọc nâng cao
+                            </button>
+
+                            <div class="small text-muted">
+                                Đang hiển thị: <span id="spCounter">0/0</span> |
+                                Đã chọn: <span id="spSelectedCount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="collapse mb-3" id="advancedFoodFilter">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold mb-1">Từ khóa</label>
+                                        <input id="fKeyword" type="text" class="form-control form-control-sm"
+                                               placeholder="Nhập tên món...">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold mb-1">Giá từ</label>
+                                        <input id="fMinPrice" type="number" class="form-control form-control-sm"
+                                               min="0" step="1000" placeholder="VD: 20000">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold mb-1">Giá đến</label>
+                                        <input id="fMaxPrice" type="number" class="form-control form-control-sm"
+                                               min="0" step="1000" placeholder="VD: 80000">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label fw-bold mb-1">Sắp xếp</label>
+                                        <select id="fSort" class="form-select form-select-sm">
+                                            <option value="">Mặc định</option>
+                                            <option value="name_asc">Tên A → Z</option>
+                                            <option value="name_desc">Tên Z → A</option>
+                                            <option value="price_asc">Giá tăng</option>
+                                            <option value="price_desc">Giá giảm</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-12 d-flex gap-3 align-items-center mt-2">
+                                        <div class="form-check">
+                                            <input id="fSelectedOnly" class="form-check-input" type="checkbox">
+                                            <label class="form-check-label" for="fSelectedOnly">
+                                                Chỉ hiện món đã nhập SL &gt; 0
+                                            </label>
+                                        </div>
+
+                                        <button id="fReset" type="button" class="btn btn-sm btn-outline-danger ms-auto">
+                                            Xóa lọc
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="table-responsive" style="max-height:420px;overflow:auto;">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width:60px;">#</th>
+                                        <th>Sản phẩm</th>
+                                        <th class="text-end" style="width:140px;">Đơn giá</th>
+                                        <th class="text-center" style="width:120px;">SL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if (sanPhams != null && sanPhams.Any())
+                                    {
+                                        var index = 1;
+                                        foreach (var sp in sanPhams)
+                                        {
+                                            <tr class="sp-row"
+                                                data-name="@((sp.TenSP ?? "").ToLower())"
+                                                data-price="@(sp.Gia.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+
+                                                <td>@index</td>
+                                                <td>@sp.TenSP</td>
+                                                <td class="text-end">@String.Format("{0:N0} ₫", sp.Gia)</td>
+                                                <td class="text-center">
+                                                    <input type="number"
+                                                           name="soLuongs"
+                                                           class="form-control form-control-sm text-end"
+                                                           min="0" value="0" />
+                                                    <input type="hidden"
+                                                           name="sanPhamIds"
+                                                           value="@sp.MaSP" />
+                                                </td>
+                                            </tr>
+                                            index++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">
+                                                Không có sản phẩm nào trong hệ thống.
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="text-muted small mt-2">
+                            * Tổng tiền sẽ được hệ thống tính lại khi lưu hóa đơn.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-3">Thông tin hóa đơn</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Khách hàng</label>
+                            @Html.DropDownList(
+                                "MaKH",
+                                (SelectList)ViewBag.MaKH,
+                                "-- Chọn khách hàng --",
+                                new { @class = "form-select" }
+                            )
+                            @Html.ValidationMessageFor(m => m.MaKH, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nhân viên</label>
+                            @Html.DropDownList(
+                                "MaNV",
+                                (SelectList)ViewBag.MaNV,
+                                "-- Chọn nhân viên --",
+                                new { @class = "form-select" }
+                            )
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Khuyến mãi</label>
+                            @Html.DropDownList(
+                                "MaKM",
+                                (SelectList)ViewBag.MaKM,
+                                "-- Không áp dụng --",
+                                new { @class = "form-select" }
+                            )
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Trạng thái</label>
+                            @Html.DropDownList(
+                                "MaTT",
+                                (SelectList)ViewBag.MaTT,
+                                "-- Chọn trạng thái --",
+                                new { @class = "form-select" }
+                            )
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ngày lập</label>
+                            @Html.TextBoxFor(
+                                m => m.NgayLap,
+                                "{0:yyyy-MM-ddTHH:mm}",
+                                new { @class = "form-control", type = "datetime-local" }
+                            )
+                            @Html.ValidationMessageFor(m => m.NgayLap, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ giao hàng</label>
+                            @Html.TextAreaFor(
+                                m => m.DiaChi,
+                                3,
+                                100,
+                                new { @class = "form-control", placeholder = "Nhập địa chỉ giao..." }
+                            )
+                            @Html.ValidationMessageFor(m => m.DiaChi, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label fw-bold d-block">Phí ship</label>
+                            <div class="form-check">
+                                @Html.CheckBox(
+                                    "PhiShip",
+                                    phiShipChecked,
+                                    new { @class = "form-check-input", id = "chkShip" }
+                                )
+                                <label class="form-check-label" for="chkShip">
+                                    Giao hàng (có tính phí ship)
+                                </label>
+                            </div>
+                        </div>
+
+                        @Html.HiddenFor(m => m.TongTien)
+
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary">← Quay lại</a>
+                    <button type="submit" class="btn btn-danger px-4 fw-bold">Tạo hóa đơn</button>
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        (function () {
+            function toNumber(val) {
+                if (val === null || val === undefined || val === "") return null;
+                var n = parseFloat(val);
+                return isNaN(n) ? null : n;
+            }
+
+            function normalize(s) {
+                return (s || "").toString().trim().toLowerCase();
+            }
+
+            function getQty($row) {
+                var v = $row.find('input[name="soLuongs"]').val();
+                var n = parseInt(v, 10);
+                return isNaN(n) ? 0 : n;
+            }
+
+            function updateSelectedCount() {
+                var count = 0;
+                $('.sp-row').each(function () {
+                    if (getQty($(this)) > 0) count++;
+                });
+                $('#spSelectedCount').text(count);
+            }
+
+            function applyFilters() {
+                var kw = normalize($('#fKeyword').val());
+                var minP = toNumber($('#fMinPrice').val());
+                var maxP = toNumber($('#fMaxPrice').val());
+                var selectedOnly = $('#fSelectedOnly').is(':checked');
+
+                var total = $('.sp-row').length;
+                var shown = 0;
+
+                $('.sp-row').each(function () {
+                    var $row = $(this);
+                    var name = normalize($row.data('name'));
+                    var price = parseFloat($row.data('price')) || 0;
+                    var qty = getQty($row);
+
+                    var ok = true;
+                    if (kw && name.indexOf(kw) === -1) ok = false;
+                    if (minP !== null && price < minP) ok = false;
+                    if (maxP !== null && price > maxP) ok = false;
+                    if (selectedOnly && qty <= 0) ok = false;
+
+                    $row.toggle(ok);
+                    if (ok) shown++;
+                });
+
+                $('#spCounter').text(shown + "/" + total);
+                updateSelectedCount();
+            }
+
+            function applySort() {
+                var mode = $('#fSort').val();
+                if (!mode) return;
+
+                var $tbody = $('.sp-row').closest('tbody');
+                var rows = $('.sp-row').get();
+
+                rows.sort(function (a, b) {
+                    var $a = $(a), $b = $(b);
+
+                    var nameA = normalize($a.data('name'));
+                    var nameB = normalize($b.data('name'));
+
+                    var priceA = parseFloat($a.data('price')) || 0;
+                    var priceB = parseFloat($b.data('price')) || 0;
+
+                    switch (mode) {
+                        case 'name_asc': return nameA.localeCompare(nameB);
+                        case 'name_desc': return nameB.localeCompare(nameA);
+                        case 'price_asc': return priceA - priceB;
+                        case 'price_desc': return priceB - priceA;
+                        default: return 0;
+                    }
+                });
+
+                // append lại theo thứ tự mới
+                for (var i = 0; i < rows.length; i++) $tbody.append(rows[i]);
+            }
+
+            function resetFilters() {
+                $('#fKeyword').val('');
+                $('#fMinPrice').val('');
+                $('#fMaxPrice').val('');
+                $('#fSelectedOnly').prop('checked', false);
+                $('#fSort').val('');
+                applySort();
+                applyFilters();
+            }
+
+            $(document).ready(function () {
+                // bind events
+                $('#fKeyword, #fMinPrice, #fMaxPrice').on('input', function () {
+                    applyFilters();
+                });
+
+                $('#fSelectedOnly').on('change', function () {
+                    applyFilters();
+                });
+
+                $('#fSort').on('change', function () {
+                    applySort();
+                    applyFilters();
+                });
+
+                $('#fReset').on('click', function () {
+                    resetFilters();
+                });
+
+                // Khi đổi SL thì cập nhật lọc/đếm (đặc biệt hữu ích với “selected only”)
+                $(document).on('input', 'input[name="soLuongs"]', function () {
+                    applyFilters();
+                });
+
+                // init
+                applySort();
+                applyFilters();
+            });
+        })();
+    </script>
+}
+

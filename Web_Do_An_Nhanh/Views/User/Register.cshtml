@@ -1,0 +1,92 @@
+﻿@model Web_Do_An_Nhanh.Models.KhachHang
+
+@{
+    ViewBag.Title = "Đăng ký thành viên Jollibee";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .text-jollibee-primary {
+        color: #fcc200 !important;
+    }
+    .text-jollibee-danger {
+        color: #dc3545 !important;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="registration-container" style="max-width: 750px; margin:auto">
+        <div class="card shadow-lg p-4 p-md-5 border-0 rounded-4">
+
+            <div class="text-center mb-4">
+                <img src="~/Content/Images/logo_1.png" alt="Jollibee Logo" style="max-height: 50px;" class="mb-3" />
+                <h3 class="card-title fw-bolder text-jollibee-danger mb-1">
+                    ĐĂNG KÝ TÀI KHOẢN
+                </h3>
+                <p class="text-muted">Tham gia ngay để nhận ưu đãi từ Gà Giòn Vui Vẻ!</p>
+            </div>
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger text-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.Error
+                </div>
+            }
+            @using (Html.BeginForm("Register", "User", FormMethod.Post, new { @class = "row g-4" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="col-12">
+                    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+                </div>
+
+                <div class="col-md-6">
+                    <label for="TenKH" class="form-label fw-bold">Họ và Tên (*)</label>
+                    @Html.EditorFor(model => model.TenKH, new { htmlAttributes = new { @class = "form-control form-control-lg" } })
+                    @Html.ValidationMessageFor(model => model.TenKH, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-md-6">
+                    <label for="Email" class="form-label fw-bold">Địa chỉ Email (*)</label>
+                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control form-control-lg", @type = "email", @placeholder = "user@example.com" } })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-md-6">
+                    <label for="SDT" class="form-label fw-bold">Số Điện Thoại (*)</label>
+                    @Html.EditorFor(model => model.SDT, new { htmlAttributes = new { @class = "form-control form-control-lg", @type = "tel" } })
+                    @Html.ValidationMessageFor(model => model.SDT, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-md-6">
+                    <label for="MatKhau" class="form-label fw-bold">Mật khẩu (*)</label>
+                    @Html.EditorFor(model => model.MatKhau, new { htmlAttributes = new { @class = "form-control form-control-lg", @type = "password", @placeholder = "Tối thiểu 6 ký tự" } })
+                    @Html.ValidationMessageFor(model => model.MatKhau, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-12">
+                    <label for="DiaChi" class="form-label fw-bold">Địa chỉ nhận hàng (*)</label>
+                    @Html.TextAreaFor(model => model.DiaChi, 3, 100, new { @class = "form-control", @placeholder = "Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/TP" })
+                    @Html.ValidationMessageFor(model => model.DiaChi, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-12 text-center mt-5">
+                    <button type="submit" class="btn btn-danger btn-lg fw-bold px-5 shadow">
+                        <i class="fas fa-user-plus me-2"></i> HOÀN TẤT ĐĂNG KÝ
+                    </button>
+                </div>
+            }
+
+            <hr class="my-4" />
+            <p class="text-center">
+                Đã có tài khoản?
+                <a href="@Url.Action("Login", "User")" class="text-decoration-none fw-bold text-jollibee-primary">
+                    Đăng nhập ngay
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

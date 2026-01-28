@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Import nhân viên";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h3>Import nhân viên từ file CSV</h3>
+
+@using (Html.BeginForm("Import", "NhanVien", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-group mb-3">
+        <label for="file">Chọn file CSV:</label>
+        <input type="file" name="file" id="file" class="form-control" />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Import</button>
+    @Html.ActionLink("Quay lại danh sách", "Index", null, new { @class = "btn btn-secondary ms-2" })
+}

@@ -1,0 +1,17 @@
+﻿@model Web_Do_An_Nhanh.Models.DropdownViewModel
+
+<div class="dropdown-menu p-3 multi-column-menu" aria-labelledby="menuDropdown">
+    <div class="dropdown-inner">
+        <div class="row">
+            @foreach (var loai in Model.LoaiMon)
+            {
+                <div class="col-4 mb-2">
+                    <a class="dropdown-item text-danger fw-bold"
+                       href="@Url.Action("Index", "SanPhams", new { maDM = loai.MaDM })">
+                        @loai.TenDM.ToUpper()
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

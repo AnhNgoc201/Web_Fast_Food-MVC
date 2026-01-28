@@ -1,0 +1,315 @@
+﻿@{
+    ViewBag.Title = "ChatBot";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+        body, html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                background-color: #f0f2f5; 
+
+    }
+
+
+        #chatContainerFull {
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                width: 100%;
+                max-width: 100%; 
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    }
+
+
+        #chatHeaderFull {
+                background-color: #DA291C; 
+                color: white;
+                padding: 15px 25px;
+                font-weight: 600;
+                font-size: 1.3em;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+                z-index: 10;
+
+    }
+
+
+        .chat-messages-full {
+                flex: 1;
+                padding: 20px 15px; 
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                gap: 10px; 
+                background-color: #f0f2f5;
+                scroll-behavior: smooth; 
+
+    }
+
+
+
+        .chat-message {
+                display: flex;
+
+    }
+
+
+        .user-message {
+                background-color: #DA291C;
+                color: white;
+                padding: 12px 18px;
+                border-radius: 20px 20px 5px 20px; 
+                max-width: 75%; 
+                margin-left: auto;
+                font-size: 0.95em;
+                line-height: 1.4;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                word-break: break-word;
+
+    }
+
+
+        .bot-message-container { 
+                display: flex;
+                align-items: flex-start;
+                margin-right: auto;
+                max-width: 80%;
+
+    }
+
+        .bot-message {
+                background-color: #ffffff;
+                color: #F8B319;
+                padding: 15px;
+                border: 1px solid #e5e5e5;
+                border-radius: 20px 20px 20px 5px; 
+                display: flex;
+                align-items: flex-start;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
+                font-size: 0.95em;
+                line-height: 1.4;
+                word-break: break-word;
+
+    }
+
+            .bot-message img {
+                    width: 70px; 
+                    height: 70px;
+                    margin-right: 15px;
+                    border-radius: 10px; 
+                    object-fit: cover;
+                    flex-shrink: 0;
+                    border: 1px solid #eee;
+
+    }
+
+            .bot-message > div {
+                    flex-grow: 1;
+                    min-width: 0;
+
+    }
+
+            .bot-message b {
+                    color: #DA291C; 
+                    font-weight: 700;
+                    display: block; 
+                    margin-bottom: 2px;
+
+    }
+
+            .bot-message .price {
+                    color: #DA291C; 
+                    font-weight: 700;
+                    font-size: 1.1em;
+                    margin-top: 5px;
+                    display: block;
+
+    }
+
+
+        .bot-text-only {
+                max-width: 90%;
+
+    }
+
+                .bot-text-only .bot-message {
+                        background-color: #E3F2FD;
+                        border: 1px solid #BBDEFB;
+
+        }
+
+
+
+        .chat-input-full {
+                display: flex;
+                align-items: center; 
+                border-top: 1px solid #e0e0e0;
+                padding: 20px 25px;
+                background: #ffffff;
+                box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+
+    }
+
+                .chat-input-full input {
+                        flex: 1;
+                        padding: 15px 20px; 
+                        border-radius: 30px;
+                        border: 1px solid #ccc;
+                        font-size: 1.1em; 
+                        outline: none;
+                        transition: border-color 0.3s, box-shadow 0.3s;
+                        margin-right: 15px; 
+
+        }
+
+                .chat-input-full input:focus {
+                        border-color: #DA291C;
+                        box-shadow: 0 0 8px rgba(218, 41, 28, 0.4); 
+
+    }
+
+            .chat-input-full button {
+                    padding: 15px 30px; 
+                    border: none;
+                    background-color: #DA291C;
+                    color: white;
+                    border-radius: 30px; 
+                    cursor: pointer;
+                    font-weight: bold;
+                    font-size: 1.1em; 
+                    transition: background-color 0.3s, transform 0.1s;
+                    flex-shrink: 0; 
+
+    }
+
+                .chat-input-full button:hover {
+                        background-color: #A31A12;
+
+    }
+
+                .chat-input-full button:active {
+                        transform: scale(0.98);
+
+    }
+</style>
+
+<div id="chatContainerFull">
+    <div id="chatHeaderFull">
+        <span>Chat với Jollibee 🐝</span>
+    </div>
+
+    <div class="chat-messages-full" id="chatMessagesFull">
+        <div class="chat-message">
+            <div class="bot-message-container bot-text-only">
+                <div class="bot-message">
+                    <div>
+                        <b>Xin chào!</b> <b> Mình là chatbot Jollibee. Bạn muốn xem thực đơn, khuyến mãi hay hỏi gì khác?</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input-full">
+        <input type="text" id="userInputFull" placeholder="Nhập câu hỏi của bạn..." />
+        <button id="sendBtnFull">Gửi</button>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    // @Url.Action("Ask") sẽ được sử dụng cho AJAX post
+    var askUrl = '@Url.Action("Ask")';
+
+    function appendMessage(message, type, isTextOnly = false) {
+        var msgDiv = $('<div class="chat-message"></div>');
+
+        if(type === 'user') {
+            msgDiv.append('<div class="user-message">' + message + '</div>');
+        } else {
+            var content = '';
+            var botMsgClass = 'bot-message-container';
+
+            // Trường hợp chỉ có text (welcome/error/faq)
+            if (isTextOnly || (!message.HinhAnh && !message.Gia)) {
+                botMsgClass += ' bot-text-only';
+                var textContent = (message.TenSP ? '<b>' + message.TenSP + '</b>' : '')
+                                + (message.TenSP && message.MoTa ? '<br/>' : '')
+                                + (message.MoTa || ''); // Đảm bảo MoTa không null/undefined
+                content = '<div class="bot-message">' + '<div>' + textContent + '</div>' + '</div>';
+            }
+            // Trường hợp hiển thị sản phẩm
+            else {
+                var imageHtml = message.HinhAnh ? '<img src="/Content/Images/' + message.HinhAnh + '" alt="' + message.TenSP + '"/>' : '';
+                // Sử dụng toLocaleString('vi-VN') cho định dạng tiền tệ Việt Nam
+                var priceHtml = (message.Gia && message.Gia > 0) ? '<span class="price">' + message.Gia.toLocaleString('vi-VN') + '₫</span>' : '';
+
+                content = '<div class="bot-message">'
+                        + imageHtml
+                        + '<div>'
+                        + '<b>' + (message.TenSP || 'Sản phẩm') + '</b>'
+                        + (message.MoTa ? '<p style="margin: 5px 0 0; font-size: 0.9em;">' + message.MoTa + '</p>' : '')
+                        + priceHtml
+                        + '</div>'
+                        + '</div>';
+            }
+            msgDiv.html('<div class="' + botMsgClass + '">' + content + '</div>');
+        }
+
+        $('#chatMessagesFull').append(msgDiv);
+        // Tự động cuộn xuống cuối
+        var messagesArea = $('#chatMessagesFull');
+        messagesArea.scrollTop(messagesArea[0].scrollHeight);
+    }
+
+    function sendMessage() {
+        var question = $('#userInputFull').val().trim();
+        if(!question) return;
+
+        // 1. Thêm tin nhắn người dùng
+        appendMessage(question, 'user');
+        $('#userInputFull').val('');
+
+        // 2. Gọi AJAX
+        $.ajax({
+            url: askUrl, // Sử dụng biến đã khai báo
+            type: 'POST',
+            data: { question: question },
+            success: function(data) {
+                if (data && data.length > 0) {
+                    data.forEach(function(msg){
+                        // Kiểm tra xem có phải chỉ là tin nhắn text không.
+                        // Giả định: Nếu không có hình ảnh và giá, nó là text-only.
+                        var isTextOnly = !msg.HinhAnh && (msg.Gia === undefined || msg.Gia === null || msg.Gia === 0);
+                        appendMessage(msg, 'bot', isTextOnly);
+                    });
+                } else {
+                    // Phản hồi mặc định khi không tìm thấy dữ liệu
+                    appendMessage({ TenSP: "Xin lỗi!", MoTa: "Hiện tại, mình không tìm thấy thông tin phù hợp với yêu cầu của bạn. Bạn thử hỏi lại nhé!", HinhAnh: null }, 'bot', true);
+                }
+            },
+            error: function() {
+                // Xử lý lỗi kết nối
+                appendMessage({ TenSP: "Lỗi kết nối!", MoTa: "Không thể kết nối với máy chủ chatbot. Vui lòng thử lại sau.", HinhAnh: null }, 'bot', true);
+            }
+        });
+    }
+
+    // Gắn sự kiện cho nút Gửi
+    $("#sendBtnFull").click(sendMessage);
+
+    // Gắn sự kiện cho phím Enter
+    $("#userInputFull").keypress(function(e){
+        if(e.which==13) sendMessage();
+    });
+
+});
+</script>

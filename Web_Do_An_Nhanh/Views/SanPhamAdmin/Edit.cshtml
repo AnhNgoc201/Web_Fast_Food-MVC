@@ -1,0 +1,112 @@
+﻿@model Web_Do_An_Nhanh.Models.SanPham
+
+@{
+    ViewBag.Title = "Chỉnh sửa sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<div class="container-fluid py-3">
+
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-edit"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Chỉnh sửa sản phẩm</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            @using (Html.BeginForm("Edit", "SanPhamAdmin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.MaSP)
+                @Html.HiddenFor(m => m.HinhAnh)
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.TenSP, "Tên sản phẩm", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.TenSP, new { @class = "form-control", placeholder = "Tên sản phẩm..." })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Gia, "Giá bán", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.Gia, new { @class = "form-control", type = "number", min = "0", step = "1000" })
+                        </div>
+
+                        @*<div class="mb-3">
+                                @Html.Label("MaDM", "Danh mục", new { @class = "form-label fw-semibold" })
+                                @Html.DropDownListFor(m => m.MaDM,
+                                    (SelectList)ViewBag.MaDM,
+                                    "-- Chọn danh mục --",
+                                    new { @class = "form-select" })
+                            </div>*@
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Danh mục</label>
+                            @Html.DropDownList(
+                                "MaDM",
+                                null,
+                                "-- Chọn danh mục --",
+                                new { @class = "form-select" }
+                            )
+                        </div>
+                        @{
+                            bool trangThaiEdit = Model.TrangThai.HasValue ? Model.TrangThai.Value : false;
+                        }
+                        <div class="mb-3 form-check">
+                            @Html.CheckBox("TrangThai", trangThaiEdit, new { @class = "form-check-input" })
+                            <label class="form-check-label fw-semibold" for="TrangThai">Đang bán</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Hình hiện tại</label>
+
+                            <div class="d-flex align-items-center mb-2">
+                                @if (!string.IsNullOrEmpty(Model.HinhAnh))
+                                {
+                                    <img src="~/Content/Images/@Model.HinhAnh"
+                                         style="width:80px;height:80px;object-fit:cover;"
+                                         class="rounded border me-3" />
+                                }
+                                else
+                                {
+                                    <div class="border rounded d-flex align-items-center justify-content-center me-3"
+                                         style="width:80px;height:80px;background:#f3f4f6;color:#9ca3af;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                }
+                            </div>
+
+                            <label class="form-label fw-semibold">Chọn hình mới</label>
+                            <input type="file" name="HinhAnhFile" class="form-control" />
+                            @*<small class="text-muted d-block mt-1">
+                                    • Nếu chọn hình mới → hệ thống sẽ cập nhật hình<br />
+                                    • Nếu không chọn → giữ nguyên hình cũ
+                                </small>*@
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            @Html.LabelFor(m => m.MoTa, "Mô tả", new { @class = "form-label fw-semibold" })
+                            @Html.TextAreaFor(m => m.MoTa, 5, 50, new { @class = "form-control", placeholder = "Mô tả..." })
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Lưu thay đổi
+                </button>
+                @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            }
+
+        </div>
+    </div>
+</div>

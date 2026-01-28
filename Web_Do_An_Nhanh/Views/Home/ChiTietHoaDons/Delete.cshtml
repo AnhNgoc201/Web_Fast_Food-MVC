@@ -1,0 +1,56 @@
+﻿@model Web_Do_An_Nhanh.Models.ChiTietHoaDon
+@{
+    ViewBag.Title = "Xóa chi tiết hóa đơn";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container py-5" style="max-width:650px">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+            <h3 class="text-danger fw-bold mb-3 text-center">XÓA CHI TIẾT HÓA ĐƠN</h3>
+            <p class="text-center text-muted mb-4">
+                Bạn có chắc chắn muốn xóa món này khỏi hóa đơn #@Model.MaHD không?
+            </p>
+
+            <div class="alert alert-danger">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 fw-bold">Hóa đơn:</dt>
+                    <dd class="col-sm-8">#@Model.MaHD</dd>
+
+                    <dt class="col-sm-4 fw-bold mt-2">Sản phẩm:</dt>
+                    <dd class="col-sm-8 mt-2">
+                        @(Model.SanPham != null ? Model.SanPham.TenSP : "Sản phẩm đã xóa")
+                    </dd>
+
+                    <dt class="col-sm-4 fw-bold mt-2">Số lượng:</dt>
+                    <dd class="col-sm-8 mt-2">@Model.SoLuong</dd>
+
+                    <dt class="col-sm-4 fw-bold mt-2">Đơn giá:</dt>
+                    <dd class="col-sm-8 mt-2">@string.Format("{0:N0} ₫", Model.DonGia)</dd>
+
+                    <dt class="col-sm-4 fw-bold mt-2">Thành tiền:</dt>
+                    <dd class="col-sm-8 mt-2 fw-bold text-dark">
+                        @string.Format("{0:N0} ₫", Model.DonGia * Model.SoLuong)
+                    </dd>
+                </dl>
+            </div>
+
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.MaHD)
+                @Html.HiddenFor(m => m.MaSP)
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="@Url.Action("Index", new { maHD = Model.MaHD })"
+                       class="btn btn-outline-secondary">
+                        Hủy
+                    </a>
+                    <button type="submit" class="btn btn-danger px-4">
+                        Xác nhận xóa
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

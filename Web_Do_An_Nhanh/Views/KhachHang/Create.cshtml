@@ -1,0 +1,94 @@
+﻿@model Web_Do_An_Nhanh.Models.KhachHang
+
+@{
+    ViewBag.Title = "Thêm khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div id="clientErrorBox" class="alert alert-danger d-none"></div>
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Thêm khách hàng mới</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên khách hàng</label>
+                            @Html.TextBoxFor(m => m.TenKH, new { @class = "form-control", data_required = "1" })
+                            @Html.ValidationMessageFor(m => m.TenKH, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", data_required = "1" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            @Html.TextBoxFor(m => m.SDT, new { @class = "form-control", type = "tel", data_required = "1" })
+                            @Html.ValidationMessageFor(m => m.SDT, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Địa chỉ</label>
+                            @Html.TextAreaFor(m => m.DiaChi, new { @class = "form-control", rows = 3, data_required = "1" })
+                            @Html.ValidationMessageFor(m => m.DiaChi, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Lưu khách hàng
+                </button>
+                @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        (function () {
+            var form = document.querySelector("form");
+            if (!form) return;
+
+            form.addEventListener("submit", function (e) {
+                var requiredInputs = form.querySelectorAll("[data-required='1']");
+                for (var i = 0; i < requiredInputs.length; i++) {
+                    var el = requiredInputs[i];
+                    if (!el.value || !el.value.trim()) {
+                        e.preventDefault();
+
+                        var box = document.getElementById("clientErrorBox");
+                        if (box) {
+                            box.classList.remove("d-none");
+                            box.innerText = "Vui lòng nhập đầy đủ thông tin trước khi lưu.";
+                        }
+
+                        el.focus();
+                        return false;
+                    }
+                }
+            });
+        })();
+    </script>
+}

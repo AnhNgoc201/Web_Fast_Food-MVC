@@ -1,0 +1,228 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.SanPham>
+
+@{
+    ViewBag.Title = "Quản lý sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+
+    @if (TempData["ImportMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["ImportMessage"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+            <div style="width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:#eff6ff;color:#2563eb;margin-right:.75rem;font-size:1.3rem;">
+                <i class="fas fa-box"></i>
+            </div>
+            <h3 class="fw-bold mb-0" style="color:#2563eb;">Quản lý sản phẩm</h3>
+        </div>
+
+        <div>
+            <a href="@Url.Action("Create")" class="btn btn-success fw-bold me-2">
+                <i class="fas fa-plus-circle me-1"></i> Thêm sản phẩm mới
+            </a>
+
+            <a href="@Url.Action("Export", new { searchString = ViewBag.CurrentSearch, maDM = ViewBag.CurrentMaDM, trangThai = ViewBag.CurrentTrangThai })"
+               class="btn btn-outline-secondary me-2">
+                <i class="fas fa-file-export me-1"></i> Xuất Excel
+            </a>
+
+            <a href="@Url.Action("Import")" class="btn btn-outline-primary">
+                <i class="fas fa-file-import me-1"></i> Import từ file
+            </a>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("Index", "SanPhamAdmin", FormMethod.Get))
+    {
+        <div class="row mb-3">
+            <div class="col-md-4 mb-2">
+                <div class="input-group">
+                    @Html.TextBox(
+                        "searchString",
+                        ViewBag.CurrentSearch as string,
+                        new { @class = "form-control", placeholder = "Tìm theo tên hoặc mô tả..." })
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-2">
+                @Html.DropDownList(
+                    "maDM",
+                    (SelectList)ViewBag.DanhMucList,
+                    "Tất cả danh mục",
+                    new { @class = "form-select", onchange = "this.form.submit();" })
+            </div>
+
+            <div class="col-md-3 mb-2">
+                <select name="trangThai" class="form-select" onchange="this.form.submit();">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="true" @(ViewBag.CurrentTrangThai == (bool?)true ? "selected" : "")>Đang bán</option>
+                    <option value="false" @(ViewBag.CurrentTrangThai == (bool?)false ? "selected" : "")>Ngừng bán</option>
+                </select>
+            </div>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color:#fef3c7;">
+                    <tr class="fw-bold text-muted">
+                        <th style="width:60px;">#</th>
+                        <th style="width:80px;">Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th class="text-end" style="width:120px;">Giá</th>
+                        <th class="text-center" style="width:140px;">Trạng thái</th>
+                        <th class="text-end" style="width:220px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int page = ViewBag.Page ?? 1;
+                        int pageSize = ViewBag.PageSize ?? 10;
+                        int totalItems = ViewBag.TotalItems ?? 0;
+                        int totalPages = ViewBag.TotalPages ?? 1;
+                        int stt = (page - 1) * pageSize;
+                    }
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var sp in Model)
+                        {
+                            stt++;
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(sp.HinhAnh))
+                                    {
+                                        <img src="~/Content/Images/@sp.HinhAnh" alt="@sp.TenSP"
+                                             width="50" height="50" class="rounded" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/Content/Images/no-image.png" alt="no-image"
+                                             width="50" height="50" class="rounded" />
+                                    }
+                                </td>
+                                <td class="fw-semibold">@sp.TenSP</td>
+                                <td>@(sp.DanhMuc != null ? sp.DanhMuc.TenDM : "—")</td>
+                                <td class="text-end">@string.Format("{0:N0} đ", sp.Gia)</td>
+
+                                <td class="text-center">
+                                    @using (Html.BeginForm("ToggleTrangThai", "SanPhamAdmin", FormMethod.Post, new { @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+
+                                        <!-- gởi kèm id và các filter hiện tại -->
+                                        <input type="hidden" name="id" value="@sp.MaSP" />
+                                        <input type="hidden" name="searchString" value="@((string)ViewBag.CurrentSearch)" />
+                                        <input type="hidden" name="maDM" value="@((int?)ViewBag.CurrentMaDM)" />
+                                        <input type="hidden" name="trangThai" value="@((bool?)ViewBag.CurrentTrangThai)" />
+                                        <input type="hidden" name="page" value="@((int?)ViewBag.Page)" />
+
+                                        if (sp.TrangThai.HasValue && sp.TrangThai.Value)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-toggle-on me-1"></i> Đang bán
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-secondary">
+                                                <i class="fas fa-toggle-off me-1"></i> Ngừng bán
+                                            </button>
+                                        }
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    <a href="@Url.Action("Details", new { id = sp.MaSP })"
+                                       class="btn btn-sm btn-outline-secondary me-1">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                    <a href="@Url.Action("Edit", new { id = sp.MaSP })"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <a href="@Url.Action("Delete", new { id = sp.MaSP })"
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Chưa có sản phẩm nào.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @{
+        int p = ViewBag.Page ?? 1;
+        int ps = ViewBag.PageSize ?? 10;
+        int total = ViewBag.TotalItems ?? 0;
+        int totalP = ViewBag.TotalPages ?? 1;
+        int fromItem = total == 0 ? 0 : (p - 1) * ps + 1;
+        int toItem = total == 0 ? 0 : (p * ps > total ? total : p * ps);
+    }
+
+    <p class="text-muted mt-2">
+        Hiển thị @fromItem - @toItem trong tổng số @total sản phẩm.
+    </p>
+
+    @if (totalP > 1)
+    {
+        <nav aria-label="SanPham pagination">
+            <ul class="pagination">
+                <li class="page-item @(p == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = p - 1, searchString = ViewBag.CurrentSearch, maDM = ViewBag.CurrentMaDM, trangThai = ViewBag.CurrentTrangThai })">«</a>
+                </li>
+
+                @for (int i = 1; i <= totalP; i++)
+                {
+                    <li class="page-item @(i == p ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentSearch, maDM = ViewBag.CurrentMaDM, trangThai = ViewBag.CurrentTrangThai })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(p == totalP ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = p + 1, searchString = ViewBag.CurrentSearch, maDM = ViewBag.CurrentMaDM, trangThai = ViewBag.CurrentTrangThai })">»</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

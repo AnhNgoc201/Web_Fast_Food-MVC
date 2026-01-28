@@ -1,0 +1,146 @@
+﻿@model Web_Do_An_Nhanh.Models.GioHang
+
+@{
+    ViewBag.Title = "Giỏ hàng của bạn";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center text-danger fw-bold">Giỏ hàng của bạn</h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr class="table-light text-center">
+                                <th scope="col">Sản phẩm</th>
+                                <th scope="col" class="text-center">Giá</th>
+                                <th scope="col" class="text-center">Số lượng</th>
+                                <th scope="col" class="text-end">Tổng cộng</th>
+                                <th scope="col" class="text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.lst != null && Model.lst.Any())
+                            {
+                                foreach (var item in Model.lst)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="~/Content/Images/@item.sHinhAnh" class="me-3 rounded" alt="@item.sTenSP" width="60" />
+                                                <span class="fw-bold">@item.sTenSP</span>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">@String.Format("{0:N0} VNĐ", item.dDonGia)</td>
+                                        <td class="text-center">
+                                            @using (Html.BeginForm("CapNhatSoLuong", "DatHang", FormMethod.Post, new { @class = "d-flex justify-content-center align-items-center" }))
+                                            {
+                                                <input type="hidden" name="msp" value="@item.iMaSP" />
+                                                <button type="submit" name="hanhDong" value="giam" class="btn btn-sm btn-outline-secondary me-1">-</button>
+                                                <input type="text" name="soLuong" value="@item.iSoLuong" class="form-control form-control-sm text-center" style="width:50px;" />
+                                                <button type="submit" name="hanhDong" value="tang" class="btn btn-sm btn-outline-secondary ms-1">+</button>
+                                            }
+                                        </td>
+                                        <td class="text-end fw-bold text-danger">@String.Format("{0:N0} VNĐ", item.ThanhTien)</td>
+                                        <td class="text-center">
+                                            @using (Html.BeginForm("XoaMatHang", "DatHang", FormMethod.Post))
+                                            {
+                                                <input type="hidden" name="msp" value="@item.iMaSP" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?');">
+                                                    Xóa
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="bi bi-cart-x me-2"></i> Giỏ hàng của bạn đang trống.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <a href="@Url.Action("Index", "SanPhams")" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Tiếp tục mua sắm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white fw-bold text-center">
+                    Tóm tắt đơn hàng
+                </div>
+                <div class="card-body">
+                    @{
+                        decimal tongTienHang = Model.TongThanhTien();
+
+                        decimal phiShip = Model.PhiShip ? 10000 : 0;
+
+                        decimal giamGia = tongTienHang * ((decimal)Model.PhanTramGiam / 100);
+
+                        decimal tongThanhToan = tongTienHang - giamGia + phiShip;
+
+                        bool gioHangTrong = Model == null || Model.lst == null || !Model.lst.Any();
+                    }
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tổng tiền hàng:</span>
+                        <span class="fw-bold">@String.Format("{0:N0} VNĐ", tongTienHang)</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Phí vận chuyển:</span>
+                        <span class="fw-bold">@String.Format("{0:N0} VNĐ", phiShip)</span>
+                    </div>
+
+                    <form method="post" action="@Url.Action("ApDungMaGiamGia", "DatHang")" class="d-flex justify-content-between mb-3">
+                        <select id="MaKM" name="maGiamGia" class="form-select me-2">
+                            <option value="">--Chọn mã giảm giá--</option>
+                            @if (ViewBag.MaGiamGiaList != null)
+                            {
+                                foreach (var km in ViewBag.MaGiamGiaList as List<Web_Do_An_Nhanh.Models.KhuyenMai>)
+                                {
+                                    <option value="@km.MaKM" @(Model != null && Model.TenKM != null && Model.TenKM == km.TenKM ? "selected" : "")>
+                                        @km.TenKM
+                                    </option>
+                                }
+                            }
+                        </select>
+                        <button type="submit" class="btn text-white" style="background-color: #7b4a52;">Áp dụng</button>
+                    </form>
+
+                    @if (giamGia > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 text-success">
+                            <span>Giảm giá (@Model.PhanTramGiam%):</span>
+                            <span class="fw-bold">-@String.Format("{0:N0} VNĐ", giamGia)</span>
+                        </div>
+                    }
+
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3 text-danger fs-5">
+                        <span class="fw-bold">TỔNG THANH TOÁN:</span>
+                        <span class="fw-bold">@String.Format("{0:N0} VNĐ", tongThanhToan)</span>
+                    </div>
+
+                    <a href="@(!gioHangTrong ? Url.Action("XacNhanDonHang", "DatHang") : "#")"
+                       class="btn btn-danger w-100 btn-lg @(gioHangTrong ? "disabled" : "")"
+                       @(gioHangTrong ? "onclick=\"alert('Giỏ hàng của bạn đang trống!'); return false;\"" : "")>
+                        Tiến hành Thanh toán
+                    </a>
+                </div>
+            </div>
+        </div>
+        <p></p>
+    </div>
+</div>

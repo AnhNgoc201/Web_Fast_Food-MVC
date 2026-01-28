@@ -1,0 +1,83 @@
+﻿@model Web_Do_An_Nhanh.Models.KhachHang
+
+@{
+    ViewBag.Title = "Chỉnh Sửa Thông Tin Cá Nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .text-jollibee-primary {
+        color: #fcc200 !important;
+    }
+    .text-jollibee-danger {
+        color: #dc3545 !important;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="edit-profile-container" style="max-width: 650px; margin:auto">
+        <div class="card shadow-lg p-4 p-md-5 border-0 rounded-4">
+
+            <h3 class="card-title text-center fw-bolder text-jollibee-danger mb-4">
+                CHỈNH SỬA THÔNG TIN CÁ NHÂN
+            </h3>
+            <p class="text-center text-muted mb-4">Cập nhật thông tin mới nhất của bạn để Jollibee phục vụ tốt hơn.</p>
+
+            @using (Html.BeginForm("Edit", "Profile", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.MaKH)
+
+            <div class="row g-4">
+
+                @Html.ValidationSummary(true, "", new { @class = "alert alert-danger col-12" })
+
+                <div class="col-12">
+                    <label class="form-label fw-bold">@Html.DisplayNameFor(m => m.TenKH)</label>
+                    @Html.EditorFor(m => m.TenKH, new { htmlAttributes = new { @class = "form-control form-control-lg", placeholder = "Họ và tên" } })
+                    @Html.ValidationMessageFor(m => m.TenKH, "", new { @class = "text-danger small mt-1" })
+                </div>
+                <div class="col-md-12">
+                    <label for="Email" class="form-label fw-bold">@Html.DisplayNameFor(model => model.Email)</label>
+                    @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", @disabled = "disabled" } })
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label fw-bold">@Html.DisplayNameFor(m => m.SDT)</label>
+                    @Html.EditorFor(m => m.SDT, new { htmlAttributes = new { @class = "form-control form-control-lg", type = "tel", placeholder = "Số điện thoại" } })
+                    @Html.ValidationMessageFor(m => m.SDT, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold">@Html.DisplayNameFor(m => m.DiaChi)</label>
+                    @Html.TextAreaFor(m => m.DiaChi, 3, 100, new { @class = "form-control", placeholder = "Địa chỉ chi tiết" })
+                    @Html.ValidationMessageFor(m => m.DiaChi, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-bold">@Html.DisplayNameFor(m => m.MatKhau)</label>
+                    @Html.EditorFor(m => m.MatKhau, new { htmlAttributes = new { @class = "form-control", type = "password", placeholder = "Bỏ trống nếu không muốn thay đổi" } })
+                    @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger small mt-1" })
+                </div>
+
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-danger btn-lg fw-bold px-5 shadow">
+                        <i class="fas fa-save me-2"></i> LƯU THAY ĐỔI
+                    </button>
+                </div>
+            </div>
+            }
+
+
+            <hr class="my-4" />
+            <div class="text-center">
+                <a href="@Url.Action("Index", "Profile")" class="text-decoration-none fw-bold text-jollibee-primary">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại 
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

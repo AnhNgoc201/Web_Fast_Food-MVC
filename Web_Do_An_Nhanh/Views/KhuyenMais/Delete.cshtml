@@ -1,0 +1,59 @@
+﻿@model Web_Do_An_Nhanh.Models.KhuyenMai
+
+@{
+    ViewBag.Title = "Xóa khuyến mãi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#fef2f2;
+             color:#dc2626;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-trash-alt"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#dc2626;">Xóa khuyến mãi</h3>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Bạn có chắc chắn muốn xóa khuyến mãi này không? Hành động này không thể hoàn tác.
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Mã khuyến mãi</dt>
+                <dd class="col-sm-9">@Model.MaKM</dd>
+
+                <dt class="col-sm-3">Tên khuyến mãi</dt>
+                <dd class="col-sm-9 fw-semibold">@Model.TenKM</dd>
+
+                <dt class="col-sm-3">Phần trăm giảm</dt>
+                <dd class="col-sm-9">@Model.PhanTramGiam %</dd>
+
+                <dt class="col-sm-3">Thời gian áp dụng</dt>
+                <dd class="col-sm-9">
+                    @(Model.NgayBatDau.HasValue ? Model.NgayBatDau.Value.ToString("dd/MM/yyyy") : "")
+                    -
+                    @(Model.NgayKetThuc.HasValue ? Model.NgayKetThuc.Value.ToString("dd/MM/yyyy") : "")
+
+                </dd>
+            </dl>
+
+            <div class="mt-4">
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(m => m.MaKM)
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> Xóa
+                    </button>
+                    @Html.ActionLink("Hủy", "Index", null,
+                        new { @class = "btn btn-secondary ms-2" })
+                }
+            </div>
+        </div>
+    </div>
+</div>

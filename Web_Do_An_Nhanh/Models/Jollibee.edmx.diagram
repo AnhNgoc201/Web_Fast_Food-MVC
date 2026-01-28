@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="3606b5ddcc2040319243d7116a2c55b8" Name="Diagram1">
+        <EntityTypeShape EntityType="JOLLIBEEModel.ChiTietHoaDon" Width="1.5" PointX="7.5" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.DanhMuc" Width="1.5" PointX="3" PointY="15.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.HoaDon" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.KhachHang" Width="1.5" PointX="3" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.KhuyenMai" Width="1.5" PointX="3" PointY="9" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.NhanVien" Width="1.5" PointX="3" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.SanPham" Width="1.5" PointX="5.25" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.TinhTrang" Width="1.5" PointX="3" PointY="12.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="JOLLIBEEModel.VaiTro" Width="1.5" PointX="0.75" PointY="2" IsExpanded="true" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__ChiTietHoa__MaHD__6383C8BA" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__ChiTietHoa__MaSP__6477ECF3" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__SanPham__MaDM__3A81B327" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__HoaDon__MaKH__5CD6CB2B" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__HoaDon__MaKM__5EBF139D" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__HoaDon__MaNV__5DCAEF64" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__HoaDon__MaTT__5FB337D6" ManuallyRouted="false" />
+        <AssociationConnector Association="JOLLIBEEModel.FK__NhanVien__MaVT__3F466844" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

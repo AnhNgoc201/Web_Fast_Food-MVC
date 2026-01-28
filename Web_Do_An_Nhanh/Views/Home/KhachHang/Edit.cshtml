@@ -1,0 +1,67 @@
+﻿@model Web_Do_An_Nhanh.Models.KhachHang
+
+@{
+    ViewBag.Title = "Chỉnh sửa khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-user-edit"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Chỉnh sửa khách hàng</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.MaKH)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.TenKH, "Họ tên", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.TenKH,
+                                new { @class = "form-control", placeholder = "Nhập họ tên khách hàng..." })
+                            @Html.ValidationMessageFor(m => m.TenKH, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Email, "Email", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.Email,
+                                new { @class = "form-control", placeholder = "Nhập email..." })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.SDT, "Số điện thoại", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.SDT,
+                                new { @class = "form-control", placeholder = "Nhập số điện thoại..." })
+                            @Html.ValidationMessageFor(m => m.SDT, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.DiaChi, "Địa chỉ", new { @class = "form-label fw-semibold" })
+                            @Html.TextAreaFor(m => m.DiaChi, 3, 40,
+                                new { @class = "form-control", placeholder = "Nhập địa chỉ..." })
+                            @Html.ValidationMessageFor(m => m.DiaChi, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Lưu thay đổi
+                </button>
+                @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            }
+        </div>
+    </div>
+</div>
