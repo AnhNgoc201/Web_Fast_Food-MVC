@@ -190,8 +190,7 @@ namespace Web_Do_An_Nhanh.Controllers
             {
                 EnableSsl = true,
                 Credentials = new NetworkCredential(
-                    "phamanhngoc201pan@gmail.com",
-                    "liwoqtlgiokhmdax" 
+                    
                 )
             };
 
