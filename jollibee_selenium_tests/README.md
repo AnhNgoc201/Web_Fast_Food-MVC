@@ -21,12 +21,12 @@ jollibee_selenium_tests/
 │   ├── sanpham_page.py      ← Trang sản phẩm, tìm kiếm, tìm kiếm nâng cao
 │   └── giohang_page.py      ← Giỏ hàng, xác nhận đặt hàng
 ├── tests/                   ← Toàn bộ test case, chia theo chức năng
-│   ├── test_01_login.py     ← Đăng nhập / Đăng xuất             (22 case)
-│   ├── test_02_register.py  ← Đăng ký tài khoản                 (18 case)
-│   ├── test_03_sanpham.py   ← Sản phẩm, tìm kiếm, danh mục       (35 case)
-│   ├── test_04_giohang.py   ← Giỏ hàng, đặt hàng, mã giảm giá    (31 case)
-│   ├── test_05_admin.py     ← Phân quyền trang quản trị          (38 case)
-│   └── test_06_ui_flow.py   ← Luồng người dùng đầy đủ (E2E)      (24 case)
+│   ├── test_01_login.py     ← Đăng nhập / Đăng xuất             (50 case)
+│   ├── test_02_register.py  ← Đăng ký tài khoản                 (50 case)
+│   ├── test_03_sanpham.py   ← Sản phẩm, tìm kiếm, danh mục       (50 case)
+│   ├── test_04_giohang.py   ← Giỏ hàng, đặt hàng, mã giảm giá    (50 case)
+│   ├── test_05_admin.py     ← Phân quyền trang quản trị          (50 case)
+│   └── test_06_ui_flow.py   ← Luồng người dùng đầy đủ (E2E)      (50 case)
 └── test_reports/            ← Báo cáo Excel tự sinh sau khi chạy test
     ├── test_results_PASS.xlsx
     └── test_results_FAIL.xlsx
