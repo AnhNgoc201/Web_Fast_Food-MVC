@@ -1,0 +1,197 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.KhachHang>
+
+@{
+    ViewBag.Title = "Quản lý khách hàng";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+
+    @if (TempData["ImportMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["ImportMessage"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="d-flex align-items-center">
+            <div style="width:42px;height:42px;border-radius:50%;display:inline-flex;
+                 align-items:center;justify-content:center;background:#eff6ff;color:#2563eb;
+                 margin-right:.75rem;font-size:1.3rem;">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="fw-bold mb-0" style="color:#2563eb;">Quản lý khách hàng</h3>
+        </div>
+
+        <div>
+            <a href="@Url.Action("Create")" class="btn btn-success fw-bold me-2">
+                <i class="fas fa-plus-circle me-1"></i> Thêm khách hàng mới
+            </a>
+
+            <a href="@Url.Action("Export", new { searchString = ViewBag.CurrentSearch })"
+               class="btn btn-outline-secondary me-2">
+                <i class="fas fa-file-export me-1"></i> Xuất Excel
+            </a>
+
+            <a href="@Url.Action("Import")" class="btn btn-outline-primary">
+                <i class="fas fa-file-import me-1"></i> Import từ file
+            </a>
+        </div>
+
+    </div>
+
+    @using (Html.BeginForm("Index", "KhachHang", FormMethod.Get))
+    {
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    @Html.TextBox("searchString",
+                        ViewBag.CurrentSearch as string,
+                        new { @class = "form-control", placeholder = "Tìm theo tên, email, SDT hoặc địa chỉ..." })
+                    &nbsp;
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color:#fef3c7;">
+                    <tr class="fw-bold text-muted">
+                        <th style="width:40px;">#</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>SDT</th>
+                        <th>Địa chỉ</th>
+                        <th class="text-end" style="width:350px;">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        int page = ViewBag.Page ?? 1;
+                        int pageSize = ViewBag.PageSize ?? 10;
+                        int totalItems = ViewBag.TotalItems ?? 0;
+                        int stt = (page - 1) * pageSize;
+                    }
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var kh in Model)
+                        {
+                            stt++;
+                            <tr>
+                                <td>@stt</td>
+                                <td class="fw-semibold">@kh.TenKH</td>
+                                <td>@kh.Email</td>
+                                <td>@kh.SDT</td>
+                                <td>@kh.DiaChi</td>
+
+                                <td class="text-end">
+                                    <a href="@Url.Action("Details", new { id = kh.MaKH })"
+                                       class="btn btn-sm btn-outline-secondary me-1">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+
+                                    <a href="@Url.Action("Edit", new { id = kh.MaKH })"
+                                       class="btn btn-sm btn-outline-primary me-1">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+
+                                    <a href="@Url.Action("Delete", new { id = kh.MaKH })"
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </a>
+                                    &nbsp;
+                                    <br />
+                                    <br />
+
+                                    @if (kh.MatKhau != null && kh.MatKhau.StartsWith("KHOA_"))
+                                    {
+                                        using (Html.BeginForm("MoKhoa", "KhachHang", new { id = kh.MaKH }, FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-success me-1">
+                                                <i class="fas fa-unlock"></i> Mở khóa
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("Khoa", new { id = kh.MaKH })"
+                                           class="btn btn-sm btn-warning me-1">
+                                            <i class="fas fa-lock"></i> Khóa
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Không có khách hàng nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @{
+        int p = ViewBag.Page;
+        int ps = ViewBag.PageSize;
+        int total = ViewBag.TotalItems;
+        int totalPages = ViewBag.TotalPages;
+
+        int fromItem = total == 0 ? 0 : (p - 1) * ps + 1;
+        int toItem = total == 0 ? 0 : (p * ps > total ? total : p * ps);
+    }
+
+    <p class="text-muted mt-2">Hiển thị @fromItem - @toItem trong tổng số @total khách hàng.</p>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(p == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = p - 1, searchString = ViewBag.CurrentSearch })">«</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(p == i ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentSearch })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(p == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = p + 1, searchString = ViewBag.CurrentSearch })">»</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

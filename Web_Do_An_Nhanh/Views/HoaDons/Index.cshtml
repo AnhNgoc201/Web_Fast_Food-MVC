@@ -1,0 +1,544 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.HoaDon>
+@using System.Linq
+
+@{
+    ViewBag.Title = "Quản lý hóa đơn";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    bool laAdmin = ViewBag.LaAdmin != null && (bool)ViewBag.LaAdmin;
+}
+
+<div class="container-fluid py-3">
+
+    @*@if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["Error"]
+            </div>
+        }*@
+
+    @if (TempData["ImportMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["ImportMessage"]
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex align-items-center">
+            <div style="width:42px;height:42px;border-radius:50%;display:inline-flex;
+                 align-items:center;justify-content:center;background:#eff6ff;
+                 color:#2563eb;margin-right:.75rem;font-size:1.3rem;">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <h3 class="fw-bold mb-0" style="color:#2563eb;">Quản lý hóa đơn</h3>
+        </div>
+
+        <div>
+            @if (laAdmin)
+            {
+                <a href="@Url.Action("Create")" class="btn btn-success fw-bold me-2">
+                    <i class="fas fa-plus-circle me-1"></i> Tạo hóa đơn mới
+                </a>
+
+                <a href="@Url.Action("Export", new {
+                           searchString = ViewBag.CurrentSearch,
+                           maKH = ViewBag.CurrentMaKH,
+                           maNV = ViewBag.CurrentMaNV,
+                           maTT = ViewBag.CurrentMaTT,
+                           fromDate = ViewBag.FromDate,
+                           toDate = ViewBag.ToDate,
+                           minTotal = ViewBag.MinTotal,
+                           maxTotal = ViewBag.MaxTotal,
+                           sortOrder = ViewBag.CurrentSort })"
+                   class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-file-excel me-1"></i> Xuất Excel
+                </a>
+
+                <a href="@Url.Action("Import")" class="btn btn-outline-primary">
+                    <i class="fas fa-file-import me-1"></i> Import từ file
+                </a>
+            }
+        </div>
+    </div>
+
+    @{
+        var statusSummary = (Model ?? Enumerable.Empty<Web_Do_An_Nhanh.Models.HoaDon>())
+            .GroupBy(h => h.TinhTrang != null ? h.TinhTrang.TenTT : "Không rõ")
+            .Select(g => new
+            {
+                TenTT = g.Key,
+                SoLuong = g.Count()
+            })
+            .ToList();
+
+        Func<string, string> getStatusClass = ten =>
+        {
+            if (string.IsNullOrWhiteSpace(ten)) return "badge bg-secondary text-light";
+
+            var t = ten.ToLower();
+
+            if (t.Contains("đặt thành công")) return "badge bg-primary text-light";
+            if (t.Contains("chờ xác nhận")) return "badge bg-warning text-dark";
+            if (t.Contains("đang làm món")) return "badge bg-info text-dark";
+            if (t.Contains("hoàn thành chế biến")) return "badge bg-success text-light";
+            if (t.Contains("đang vận chuyển")) return "badge bg-secondary text-light";
+            if (t.Contains("đã giao")) return "badge bg-success text-light";
+            if (t.Contains("hủy")) return "badge bg-danger text-light";
+
+            return "badge bg-secondary text-light";
+        };
+    }
+
+    @if (statusSummary.Any())
+    {
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-body py-2">
+                <div class="d-flex flex-wrap gap-3">
+                    @foreach (var item in statusSummary)
+                    {
+                        var badgeClass = getStatusClass(item.TenTT) + " rounded-pill px-3 py-2";
+                        <div class="@badgeClass">
+                            <span class="fw-semibold">@item.TenTT:</span>
+                            <span class="ms-1">@item.SoLuong</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @using (Html.BeginForm("Index", "HoaDons", FormMethod.Get))
+    {
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-body pb-2">
+                <div class="row g-2">
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Từ khóa</label>
+                        @Html.TextBox(
+                            "searchString",
+                            ViewBag.CurrentSearch as string,
+                            new { @class = "form-control", placeholder = "Mã HĐ, KH, NV, địa chỉ..." })
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Khách hàng</label>
+                        @Html.DropDownList(
+                            "maKH",
+                            (SelectList)ViewBag.KhachHangList,
+                            "Tất cả",
+                            new { @class = "form-select" })
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Nhân viên xử lý</label>
+
+                        @if (laAdmin)
+                        {
+                            @Html.DropDownList(
+                                "maNV",
+                                (SelectList)ViewBag.NhanVienList,
+                                "Tất cả",
+                                new { @class = "form-select" })
+                        }
+                        else
+                        {
+                            <input class="form-control"
+                                   value="@(ViewBag.TenNhanVienDangNhap ?? "")"
+                                   readonly />
+                            <input type="hidden" name="maNV" value="@(ViewBag.CurrentMaNV ?? "")" />
+                        }
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Trạng thái</label>
+                        @Html.DropDownList(
+                            "maTT",
+                            (SelectList)ViewBag.TinhTrangList,
+                            "Tất cả",
+                            new { @class = "form-select" })
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Từ ngày</label>
+                        <input type="date"
+                               name="fromDate"
+                               value="@ViewBag.FromDate"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Đến ngày</label>
+                        <input type="date"
+                               name="toDate"
+                               value="@ViewBag.ToDate"
+                               class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Tổng tiền từ</label>
+                        <input type="number"
+                               name="minTotal"
+                               value="@(ViewBag.MinTotal ?? "")"
+                               class="form-control"
+                               min="0" step="1000" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">Tổng tiền đến</label>
+                        <input type="number"
+                               name="maxTotal"
+                               value="@(ViewBag.MaxTotal ?? "")"
+                               class="form-control"
+                               min="0" step="1000" />
+                    </div>
+
+                    <div class="col-12 mt-2">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-filter me-1"></i> Áp dụng lọc
+                        </button>
+                        <a href="@Url.Action("Index")" class="btn btn-outline-secondary">
+                            <i class="fas fa-undo me-1"></i> Xóa lọc
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+    @using (Html.BeginForm("BulkUpdateStatus", "HoaDons", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="searchString" value="@(ViewBag.CurrentSearch as string)" />
+        <input type="hidden" name="maKH" value="@(ViewBag.CurrentMaKH ?? "")" />
+        <input type="hidden" name="maNV" value="@(ViewBag.CurrentMaNV ?? "")" />
+        <input type="hidden" name="maTT" value="@(ViewBag.CurrentMaTT ?? "")" />
+        <input type="hidden" name="fromDate" value="@ViewBag.FromDate" />
+        <input type="hidden" name="toDate" value="@ViewBag.ToDate" />
+        <input type="hidden" name="minTotal" value="@(ViewBag.MinTotal ?? "")" />
+        <input type="hidden" name="maxTotal" value="@(ViewBag.MaxTotal ?? "")" />
+        <input type="hidden" name="sortOrder" value="@ViewBag.CurrentSort" />
+        <input type="hidden" name="page" value="@(ViewBag.Page ?? 1)" />
+        <input type="hidden" name="pageSize" value="@(ViewBag.PageSize ?? 10)" />
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body pb-0">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" id="chkSelectAll" class="form-check-input" />
+                        <label for="chkSelectAll" class="form-check-label">
+                            Chọn tất cả
+                        </label>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-semibold">Cập nhật trạng thái:</span>
+                        @Html.DropDownList(
+                            "maTTMoi",
+                            (SelectList)ViewBag.TinhTrangAll,
+                            "-- Chọn trạng thái mới --",
+                            new { @class = "form-select form-select-sm", style = "width:220px;" })
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="fas fa-check me-1"></i> Áp dụng cho đã chọn
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background-color:#fef3c7;">
+                            <tr class="fw-bold text-muted">
+                                <th style="width:40px;"></th>
+                                <th style="width:60px;">Mã HĐ</th>
+                                <th>Khách hàng</th>
+                                <th>Nhân viên</th>
+                                <th style="width:130px;">
+                                    <a href="@Url.Action("Index", new {
+                                               sortOrder = ViewBag.DateSort,
+                                               searchString = ViewBag.CurrentSearch,
+                                               maKH = ViewBag.CurrentMaKH,
+                                               maNV = ViewBag.CurrentMaNV,
+                                               maTT = ViewBag.CurrentMaTT,
+                                               fromDate = ViewBag.FromDate,
+                                               toDate = ViewBag.ToDate,
+                                               minTotal = ViewBag.MinTotal,
+                                               maxTotal = ViewBag.MaxTotal
+                                           })"
+                                       class="text-decoration-none text-muted">
+                                        Ngày lập
+                                        @if (ViewBag.CurrentSort == "date_asc")
+                                        {
+                                            <i class="fas fa-sort-up ms-1"></i>
+                                        }
+                                        else if (ViewBag.CurrentSort == "date_desc")
+                                        {
+                                            <i class="fas fa-sort-down ms-1"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th style="width:130px;">
+                                    <a href="@Url.Action("Index", new {
+                                               sortOrder = ViewBag.TotalSort,
+                                               searchString = ViewBag.CurrentSearch,
+                                               maKH = ViewBag.CurrentMaKH,
+                                               maNV = ViewBag.CurrentMaNV,
+                                               maTT = ViewBag.CurrentMaTT,
+                                               fromDate = ViewBag.FromDate,
+                                               toDate = ViewBag.ToDate,
+                                               minTotal = ViewBag.MinTotal,
+                                               maxTotal = ViewBag.MaxTotal
+                                           })"
+                                       class="text-decoration-none text-muted">
+                                        Tổng tiền
+                                        @if (ViewBag.CurrentSort == "total_asc")
+                                        {
+                                            <i class="fas fa-sort-up ms-1"></i>
+                                        }
+                                        else if (ViewBag.CurrentSort == "total_desc")
+                                        {
+                                            <i class="fas fa-sort-down ms-1"></i>
+                                        }
+                                    </a>
+                                </th>
+                                <th style="width:140px;">Trạng thái</th>
+                                <th>Địa chỉ</th>
+                                <th style="width:250px;" class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int page = ViewBag.Page ?? 1;
+                                int pageSize = ViewBag.PageSize ?? 10;
+                                int totalItems = ViewBag.TotalItems ?? 0;
+                                int sttStart = (page - 1) * pageSize;
+                            }
+
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var hd in Model)
+                                {
+                                    string rowId = "order-" + hd.MaHD;
+                                    sttStart++;
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"
+                                                   name="selectedIds"
+                                                   value="@hd.MaHD"
+                                                   class="form-check-input chk-row" />
+                                        </td>
+                                        <td class="fw-semibold">@hd.MaHD</td>
+                                        <td>@(hd.KhachHang != null ? hd.KhachHang.TenKH : "")</td>
+                                        <td>@(hd.NhanVien != null ? hd.NhanVien.TenNV : "")</td>
+                                        <td>
+                                            @{
+                                                DateTime? ngay = hd.NgayLap as DateTime?;
+                                            }
+                                            @( (hd.NgayLap is DateTime)
+                                                ? ((DateTime)hd.NgayLap).ToString("dd/MM/yyyy HH:mm")
+                                                : (ngay.HasValue ? ngay.Value.ToString("dd/MM/yyyy HH:mm") : "")
+                                             )
+                                        </td>
+                                        <td>@string.Format("{0:N0} đ", hd.TongTien)</td>
+                                        <td>
+                                            @{
+                                                var tenTT = hd.TinhTrang != null ? hd.TinhTrang.TenTT : "";
+                                                var badgeClass = getStatusClass(tenTT) + " text-nowrap";
+                                            }
+                                            <span class="@badgeClass">
+                                                @tenTT
+                                            </span>
+                                        </td>
+                                        <td>@hd.DiaChi</td>
+                                        <td class="text-end">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-secondary me-1"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#@rowId">
+                                                <i class="fas fa-list-ul"></i> Chi tiết
+                                            </button>
+
+                                            <a href="@Url.Action("Details", new { id = hd.MaHD })"
+                                               class="btn btn-sm btn-outline-secondary me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+
+                                            <a href="@Url.Action("Edit", new { id = hd.MaHD })"
+                                               class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+
+                                            @if (laAdmin)
+                                            {
+                                                <a href="@Url.Action("Delete", new { id = hd.MaHD })"
+                                                   class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <tr class="bg-light collapse" id="@rowId">
+                                        <td colspan="9">
+                                            <div class="p-3">
+                                                <h6 class="fw-bold mb-2">
+                                                    Chi tiết sản phẩm
+                                                </h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm mb-0">
+                                                        <thead>
+                                                            <tr class="text-muted">
+                                                                <th style="width:60px;">#</th>
+                                                                <th>Sản phẩm</th>
+                                                                <th style="width:100px;">SL</th>
+                                                                <th style="width:130px;">Đơn giá</th>
+                                                                <th style="width:130px;">Thành tiền</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @{
+                                                                int sttCt = 0;
+                                                            }
+                                                            @foreach (var ct in hd.ChiTietHoaDons)
+                                                            {
+                                                                sttCt++;
+                                                                <tr>
+                                                                    <td>@sttCt</td>
+                                                                    <td>@(ct.SanPham != null ? ct.SanPham.TenSP : "")</td>
+                                                                    <td>@ct.SoLuong</td>
+                                                                    <td>@string.Format("{0:N0} đ", ct.DonGia)</td>
+                                                                    <td>@string.Format("{0:N0} đ", ct.SoLuong * ct.DonGia)</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-4">
+                                        Chưa có hóa đơn nào.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    @{
+        int p = ViewBag.Page ?? 1;
+        int ps = ViewBag.PageSize ?? 10;
+        int total = ViewBag.TotalItems ?? 0;
+        int totalP = ViewBag.TotalPages ?? 1;
+        int fromItem = total == 0 ? 0 : (p - 1) * ps + 1;
+        int toItem = total == 0 ? 0 : (p * ps > total ? total : p * ps);
+    }
+
+    <p class="text-muted mt-2">
+        Hiển thị @fromItem - @toItem trong tổng số @total hóa đơn.
+    </p>
+
+    @if (totalP > 1)
+    {
+        <nav aria-label="HoaDon pagination">
+            <ul class="pagination">
+                <li class="page-item @(p == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                                page = p - 1,
+                                searchString = ViewBag.CurrentSearch,
+                                maKH = ViewBag.CurrentMaKH,
+                                maNV = ViewBag.CurrentMaNV,
+                                maTT = ViewBag.CurrentMaTT,
+                                fromDate = ViewBag.FromDate,
+                                toDate = ViewBag.ToDate,
+                                minTotal = ViewBag.MinTotal,
+                                maxTotal = ViewBag.MaxTotal,
+                                sortOrder = ViewBag.CurrentSort })">«</a>
+                </li>
+
+                @for (int i = 1; i <= totalP; i++)
+                {
+                    <li class="page-item @(i == p ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new {
+                                    page = i,
+                                    searchString = ViewBag.CurrentSearch,
+                                    maKH = ViewBag.CurrentMaKH,
+                                    maNV = ViewBag.CurrentMaNV,
+                                    maTT = ViewBag.CurrentMaTT,
+                                    fromDate = ViewBag.FromDate,
+                                    toDate = ViewBag.ToDate,
+                                    minTotal = ViewBag.MinTotal,
+                                    maxTotal = ViewBag.MaxTotal,
+                                    sortOrder = ViewBag.CurrentSort })">@i</a>
+                                </li>
+                            }
+
+                <li class="page-item @(p == totalP ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                                page = p + 1,
+                                searchString = ViewBag.CurrentSearch,
+                                maKH = ViewBag.CurrentMaKH,
+                                maNV = ViewBag.CurrentMaNV,
+                                maTT = ViewBag.CurrentMaTT,
+                                fromDate = ViewBag.FromDate,
+                                toDate = ViewBag.ToDate,
+                                minTotal = ViewBag.MinTotal,
+                                maxTotal = ViewBag.MaxTotal,
+                                sortOrder = ViewBag.CurrentSort })">»</a>
+                </li>
+            </ul>
+        </nav>
+    }
+
+</div>
+
+@section scripts {
+    <script>
+        const chkAll = document.getElementById("chkSelectAll");
+        if (chkAll) {
+            chkAll.addEventListener("change", function () {
+                var checked = this.checked;
+                document.querySelectorAll(".chk-row").forEach(function (cb) {
+                    cb.checked = checked;
+                });
+            });
+        }
+    </script>
+}
+

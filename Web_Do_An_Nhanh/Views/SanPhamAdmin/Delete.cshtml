@@ -1,0 +1,96 @@
+﻿@model Web_Do_An_Nhanh.Models.SanPham
+
+@{
+    ViewBag.Title = "Xóa sản phẩm";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#fef2f2;
+             color:#dc2626;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-trash-alt"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#dc2626;">Xóa sản phẩm</h3>
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-4 text-center mb-3 mb-md-0">
+                    @if (!string.IsNullOrEmpty(Model.HinhAnh))
+                    {
+                        <img src="~/Content/Images/@Model.HinhAnh"
+                             alt="@Model.TenSP"
+                             class="rounded border"
+                             style="max-width:100%;height:auto;object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div class="border rounded d-flex align-items-center justify-content-center"
+                             style="width:200px;height:200px;margin:0 auto;background:#f3f4f6;color:#9ca3af;">
+                            <i class="fas fa-image fa-2x"></i>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-8">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Mã sản phẩm</dt>
+                        <dd class="col-sm-8">@Model.MaSP</dd>
+
+                        <dt class="col-sm-4">Tên sản phẩm</dt>
+                        <dd class="col-sm-8 fw-semibold">@Model.TenSP</dd>
+
+                        <dt class="col-sm-4">Danh mục</dt>
+                        <dd class="col-sm-8">
+                            @(Model.DanhMuc != null ? Model.DanhMuc.TenDM : "")
+                        </dd>
+
+                        <dt class="col-sm-4">Giá bán</dt>
+                        <dd class="col-sm-8">
+                            @string.Format("{0:N0} đ", Model.Gia)
+                        </dd>
+
+                        <dt class="col-sm-4">Trạng thái</dt>
+                        <dd class="col-sm-8">
+                            @if (Model.TrangThai.HasValue && Model.TrangThai.Value)
+                            {
+                                <span class="badge bg-success">Đang bán</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Ngừng bán</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Mô tả</dt>
+                        <dd class="col-sm-8">@Model.MoTa</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                @using (Html.BeginForm("Delete", "SanPhamAdmin", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Xóa
+                    </button>
+                    @Html.ActionLink("Hủy", "Index", null,
+                        new { @class = "btn btn-secondary ms-2" })
+                }
+            </div>
+
+        </div>
+    </div>
+</div>

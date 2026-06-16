@@ -1,0 +1,41 @@
+﻿@model List<Web_Do_An_Nhanh.Models.SanPham>
+@{
+    Layout = null; 
+}
+
+<div class="row g-4">
+    @foreach (var sp in Model)
+    {
+        <div class="col-md-4 col-lg-3 d-flex">
+            <a href="@Url.Action("Details", "SanPhams", new { id = sp.MaSP })"
+               class="category-card card text-decoration-none border-0 w-100 rounded-3 overflow-hidden shadow-sm transition-hover">
+
+                <div class="card-img-top overflow-hidden">
+                    <img src="~/Content/Images/@sp.HinhAnh" alt="@sp.TenSP" class="img-fluid w-100 product-img-zoom" style="height: 150px; object-fit: cover;" />
+                </div>
+
+                <div class="card-body p-3">
+                    <h5 class="text-center text-danger fs-6 mb-0">@sp.TenSP</h5>                
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+<style>
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .transition-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important; 
+        }
+    .product-img-zoom {
+        transition: transform 0.5s ease;
+    }
+
+    .transition-hover:hover .product-img-zoom {
+        transform: scale(1.05);
+    }
+</style>

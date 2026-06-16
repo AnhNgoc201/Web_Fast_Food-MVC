@@ -1,0 +1,304 @@
+﻿@model Web_Do_An_Nhanh.Models.HoaDon
+@using System.Linq
+
+@{
+    ViewBag.Title = "Cập nhật hóa đơn #" + Model.MaHD;
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    bool laAdmin = ViewBag.LaAdmin != null && (bool)ViewBag.LaAdmin;
+    decimal tamTinh = 0m;
+
+    if (Model.ChiTietHoaDons != null && Model.ChiTietHoaDons.Any())
+    {
+        foreach (var ct in Model.ChiTietHoaDons)
+        {
+            tamTinh += ct.DonGia * ct.SoLuong;
+        }
+    }
+
+    decimal tongDb = Model.TongTien ?? 0m;
+
+    decimal giam = 0m;
+    if (Model.KhuyenMai != null && Model.KhuyenMai.PhanTramGiam.HasValue)
+    {
+        decimal pt = Convert.ToDecimal(Model.KhuyenMai.PhanTramGiam.Value); 
+        giam = Math.Round(tamTinh * pt / 100m, 0);
+    }
+
+    bool coShip = Model.PhiShip ?? false;
+    decimal phiShipTien = coShip ? 10000m : 0m;
+    string phiShipText = coShip ? "Giao hàng (có ship)" : "Không ship";
+    string tenTT = Model.TinhTrang != null ? Model.TinhTrang.TenTT : "";
+    string statusClass;
+    switch (tenTT)
+    {
+        case "Đã hủy":
+            statusClass = "badge bg-danger";
+            break;
+        case "Đặt thành công":
+            statusClass = "badge bg-primary";
+            break;
+        case "Chờ xác nhận":
+            statusClass = "badge bg-warning text-dark";
+            break;
+        case "Đang vận chuyển":
+            statusClass = "badge bg-secondary";
+            break;
+        case "Đang làm món":
+            statusClass = "badge bg-info";
+            break;
+        default:
+            statusClass = "badge bg-light text-dark";
+            break;
+    }
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#fee2e2;
+             color:#dc2626;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-edit"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#dc2626;">
+            Cập nhật hóa đơn #@Model.MaHD
+        </h3>
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.MaHD)
+
+        <div class="row">
+            <div class="col-lg-7 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Thông tin hóa đơn</h5>
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.MaKH, "Khách hàng", new { @class = "form-label fw-semibold" })
+
+                                    @if (laAdmin)
+                                    {
+                                        @Html.DropDownList(
+                                            "MaKH",
+                                            null,
+                                            "-- Chọn khách hàng --",
+                                            new { @class = "form-select" }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        <p class="form-control-plaintext mb-0">
+                                            @(Model.KhachHang != null ? Model.KhachHang.TenKH : "(Khách lẻ)")
+                                        </p>
+                                        @Html.HiddenFor(m => m.MaKH)
+                                    }
+
+                                    @Html.ValidationMessageFor(m => m.MaKH, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.MaKM, "Khuyến mãi", new { @class = "form-label fw-semibold" })
+
+                                    @if (laAdmin)
+                                    {
+                                        @Html.DropDownList(
+                                            "MaKM",
+                                            null,
+                                            "-- Không áp dụng --",
+                                            new { @class = "form-select" }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        <p class="form-control-plaintext mb-0">
+                                            @(Model.KhuyenMai != null ? Model.KhuyenMai.TenKM : "Không áp dụng")
+                                        </p>
+                                        @Html.HiddenFor(m => m.MaKM)
+                                    }
+
+                                    @Html.ValidationMessageFor(m => m.MaKM, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.NgayLap, "Ngày lập", new { @class = "form-label fw-semibold" })
+                                    @if (laAdmin)
+                                    {
+                                        @Html.TextBoxFor(m => m.NgayLap,
+                                            "{0:yyyy-MM-ddTHH:mm}",
+                                            new { @class = "form-control", type = "datetime-local" })
+                                    }
+                                    else
+                                    {
+                                        <p class="form-control-plaintext mb-0">
+                                            @(Model.NgayLap.HasValue
+                                                ? Model.NgayLap.Value.ToString("dd/MM/yyyy HH:mm")
+                                                : "(Chưa có)")
+                                        </p>
+                                        @Html.HiddenFor(m => m.NgayLap)
+                                    }
+                                    @Html.ValidationMessageFor(m => m.NgayLap, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.MaNV, "Nhân viên xử lý", new { @class = "form-label fw-semibold" })
+
+                                    @if (laAdmin)
+                                    {
+                                        @Html.DropDownList(
+                                            "MaNV",
+                                            null,
+                                            "-- Chọn nhân viên --",
+                                            new { @class = "form-select" }
+                                        )
+                                    }
+                                    else
+                                    {
+                                        <p class="form-control-plaintext mb-0">
+                                            @(Model.NhanVien != null ? Model.NhanVien.TenNV : "(Không rõ)")
+                                        </p>
+                                        @Html.HiddenFor(m => m.MaNV)
+                                    }
+
+                                    @Html.ValidationMessageFor(m => m.MaNV, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.MaTT, "Trạng thái", new { @class = "form-label fw-semibold" })
+
+                                    @Html.DropDownList(
+                                        "MaTT",
+                                        null,
+                                        new { @class = "form-select" }
+                                    )
+
+                                    @Html.ValidationMessageFor(m => m.MaTT, "", new { @class = "text-danger" })
+                                </div>
+
+                                <div class="mb-3">
+                                    @Html.LabelFor(m => m.TongTien, "Tổng tiền", new { @class = "form-label fw-semibold" })
+                                    <p class="form-control-plaintext mb-0" style="color:red">
+                                        <b>@tongDb.ToString("N0") đ</b>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.DiaChi, "Địa chỉ giao hàng", new { @class = "form-label fw-semibold" })
+                            @if (laAdmin)
+                            {
+                                @Html.TextAreaFor(m => m.DiaChi, 3, 50,
+                                    new { @class = "form-control", placeholder = "Địa chỉ giao hàng..." })
+                            }
+                            else
+                            {
+                                <p class="form-control-plaintext mb-0">
+                                    @(!string.IsNullOrWhiteSpace(Model.DiaChi)
+                                        ? Model.DiaChi
+                                        : "Không có")
+                                </p>
+                                @Html.HiddenFor(m => m.DiaChi)
+                            }
+                            @Html.ValidationMessageFor(m => m.DiaChi, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Phí ship</label>
+                            <div class="form-check">
+                                @Html.CheckBox(
+                                    "PhiShip",          
+                                    coShip,          
+                                    new { @class = "form-check-input", id = "PhiShip" }
+                                )
+                                <label class="form-check-label" for="PhiShip">
+                                    Giao hàng (có tính phí ship)
+                                </label>
+                            </div>
+                            <div class="text-muted" style="font-size:.85rem;">
+                                Nếu không tick, xem như khách tự đến lấy (không tính phí ship).
+                            </div>
+                        </div>
+
+                        <div class="d-flex">
+                            <a href="@Url.Action("Details", new { id = Model.MaHD })"
+                               class="btn btn-outline-secondary me-2">
+                                Quay lại chi tiết
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-save me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 mb-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Tóm tắt hóa đơn</h5>
+
+                        <p class="mb-1">
+                            <strong>Khách hàng:</strong>
+                            @(Model.KhachHang != null ? Model.KhachHang.TenKH : "(Khách lẻ)")
+                        </p>
+                        <p class="mb-1">
+                            <strong>Nhân viên:</strong>
+                            @(Model.NhanVien != null ? Model.NhanVien.TenNV : "(Không rõ)")
+                        </p>
+                        <p class="mb-1">
+                            <strong>Ngày lập:</strong>
+                            @(Model.NgayLap.HasValue
+                                ? Model.NgayLap.Value.ToString("dd/MM/yyyy HH:mm")
+                                : "(Chưa có)")
+                        </p>
+                        <p class="mb-2">
+                            <strong>Trạng thái:</strong>
+                            <span class="@statusClass">@(!string.IsNullOrEmpty(tenTT) ? tenTT : "Không rõ")</span>
+                        </p>
+
+                        <hr class="my-2" />
+
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Tạm tính</span>
+                            <span>@tamTinh.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Khuyến mãi</span>
+                            <span class="text-danger">-@giam.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Phí ship</span>
+                            <span>@phiShipTien.ToString("N0") đ</span>
+                        </div>
+
+                        <hr class="my-2" />
+
+                        <div class="d-flex justify-content-between align-items-baseline mb-1">
+                            <span class="fw-bold">Tổng tiền</span>
+                            <span class="fw-bold text-danger" style="font-size:1.1rem;">
+                                @tongDb.ToString("N0") đ
+                            </span>
+                        </div>
+
+                        @*<div class="text-muted" style="font-size:.8rem;">
+                            * Thay đổi sẽ được lưu vào CSDL sau khi bấm "Lưu thay đổi".
+                        </div>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

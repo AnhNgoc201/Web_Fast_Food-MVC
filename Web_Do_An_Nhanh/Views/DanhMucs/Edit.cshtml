@@ -1,0 +1,47 @@
+﻿@model Web_Do_An_Nhanh.Models.DanhMuc
+
+@{
+    ViewBag.Title = "Chỉnh sửa danh mục";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-edit"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Chỉnh sửa danh mục</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.MaDM)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.TenDM, "Tên danh mục", new { @class = "form-label fw-semibold" })
+                    @Html.TextBoxFor(m => m.TenDM,
+                        new { @class = "form-control", placeholder = "Nhập tên danh mục...", required = "required" })
+                    @Html.ValidationMessageFor(m => m.TenDM, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.MoTa, "Mô tả", new { @class = "form-label fw-semibold" })
+                    @Html.TextAreaFor(m => m.MoTa, 4, 50,
+                        new { @class = "form-control", placeholder = "Nhập mô tả...", required = "required" })
+                    @Html.ValidationMessageFor(m => m.MoTa, "", new { @class = "text-danger" })
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Lưu thay đổi
+                </button>
+                @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            }
+        </div>
+    </div>
+</div>

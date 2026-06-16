@@ -1,0 +1,186 @@
+﻿@model Web_Do_An_Nhanh.Models.SanPham
+
+@{
+    ViewBag.Title = Model.TenSP;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="product-details-section py-5">
+    <div class="container">
+
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <div class="row g-5">
+
+                    <!-- Hình sản phẩm -->
+                    <div class="col-lg-5">
+                        <div class="product-image-container rounded-3 overflow-hidden shadow-sm border border-2 border-light">
+                            <img src="~/Content/Images/@Model.HinhAnh" alt="@Model.TenSP"
+                                 class="img-fluid w-100 product-detail-img"
+                                 style="object-fit: cover; height: 450px;" />
+                        </div>
+                    </div>
+
+                    <!-- Thông tin sản phẩm -->
+                    <div class="col-lg-7">
+                        <h1 class="display-5 fw-bolder text-dark mb-2">@Model.TenSP</h1>
+
+                        <p class="text-muted fs-5 mb-3">
+                            @if (Model.TrangThai == true)
+                            {
+                                <span class="badge bg-success fs-6">CÒN HÀNG</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary fs-6">HẾT HÀNG</span>
+                            }
+                        </p>
+
+                        <div class="price-box mb-4">
+                            <span class="text-danger fw-bolder display-4">@string.Format("{0:N0}", Model.Gia) đ</span>
+                        </div>
+
+                        <hr />
+
+                        <p class="text-secondary lead">
+                            @Html.Raw(Model.MoTa)
+                        </p>
+
+                        <div class="action-block mt-4 pt-3 border-top">
+
+                            @using (Html.BeginForm("ThemMatHang", "DatHang", FormMethod.Post))
+                            {
+                                <input type="hidden" name="msp" value="@Model.MaSP" />
+
+                                <div class="d-flex align-items-center mt-3">
+                                    <label class="me-2 fw-semibold">Số lượng:</label>
+
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="number" name="SoLuong"
+                                               value="1" min="1" max="10"
+                                               class="form-control text-center" />
+                                    </div>
+                                </div>
+
+
+                                <div class="mt-4">
+                                    <button type="submit"
+                                            class="btn btn-danger btn-lg px-4"
+                                            @(Model.TrangThai != true ? "disabled" : "")>
+                                        🛒 Thêm vào giỏ
+                                    </button>
+
+                                    <a href="@Url.Action("Index", "SanPhams")"
+                                       class="btn btn-outline-secondary btn-lg px-4 ms-2">
+                                        Quay lại
+                                    </a>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@if (ViewBag.SanPhamTuongTu != null)
+{
+    <section class="related-products my-5">
+        <div class="container">
+            <h2 class="fw-bold mb-4 text-center">SẢN PHẨM TƯƠNG TỰ</h2>
+
+            <div class="row g-4">
+                @foreach (var item in ViewBag.SanPhamTuongTu as List<Web_Do_An_Nhanh.Models.SanPham>)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="card h-100 shadow-sm border-0 product-card position-relative">
+
+                            <img src="~/Content/Images/@item.HinhAnh"
+                                 class="card-img-top related-img rounded-2"
+                                 style="height: 210px; object-fit: cover;" />
+
+                            @if (item.TrangThai == true)
+                            {
+                                <span class="badge bg-success position-absolute top-0 start-0 m-2">CÒN HÀNG</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary position-absolute top-0 start-0 m-2">HẾT HÀNG</span>
+                            }
+
+                        <div class="card-body text-center">
+                            <h5 class="fw-bold text-danger">@item.TenSP</h5>
+                            <p class="text-muted small">@item.DanhMuc.TenDM</p>
+
+                            <p class="small">
+                                @(item.MoTa != null && item.MoTa.Length > 50
+                                        ? item.MoTa.Substring(0, 50) + "..."
+                                        : item.MoTa)
+                            </p>
+
+                            <p class="fs-5 fw-bold text-dark">@string.Format("{0:N0}", item.Gia) đ</p>
+
+                            <a href="@Url.Action("Details", "SanPhams", new { id = item.MaSP })"
+                               class="btn btn-outline-danger btn-sm w-100 mb-2">
+                                <i class="fas fa-eye me-1"></i> Xem Chi Tiết
+                            </a>
+
+                            @if (item.TrangThai == true)
+                            {
+                                using (Html.BeginForm("ThemMatHang", "DatHang", FormMethod.Post))
+                                {
+                                    <input type="hidden" name="msp" value="@item.MaSP" />
+                                    <input type="hidden" name="SoLuong" value="1" />
+                                    <button type="submit" class="btn btn-danger btn-sm w-100">
+                                        <i class="fas fa-cart-plus me-1"></i> Thêm vào Giỏ Hàng
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary btn-sm w-100" disabled>
+                                    Hết hàng
+                                </button>
+                            }
+
+                        </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    </section>
+}
+
+<!-- CSS -->
+<style>
+    .product-detail-img,
+    .related-img {
+        transition: .3s ease;
+    }
+
+    .product-image-container:hover .product-detail-img,
+    .product-card:hover .related-img {
+        transform: scale(1.05);
+    }
+
+    .product-card {
+        transition: .2s ease;
+    }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+        }
+
+    /* Ẩn nút tăng giảm của input number */
+    .quantity-control input::-webkit-outer-spin-button,
+    .quantity-control input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>

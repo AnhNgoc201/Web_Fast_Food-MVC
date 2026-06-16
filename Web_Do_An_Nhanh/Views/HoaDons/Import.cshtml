@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Import hóa đơn từ Excel";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-file-import"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Import hóa đơn từ Excel</h3>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @using (Html.BeginForm("Import", "HoaDons", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Chọn file Excel</label>
+                    <input type="file" name="file" id="file"
+                           class="form-control"
+                           accept=".csv,text/csv" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-upload me-1"></i> Import
+                </button>
+                @Html.ActionLink("Quay lại danh sách", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            }
+        </div>
+    </div>
+</div>

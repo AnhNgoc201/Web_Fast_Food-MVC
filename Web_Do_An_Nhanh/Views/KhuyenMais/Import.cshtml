@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Import khuyến mãi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    <h3 class="fw-bold mb-3" style="color:#2563eb;">
+        Import khuyến mãi từ file CSV
+    </h3>
+
+    @using (Html.BeginForm("Import", "KhuyenMais", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label for="file" class="form-label">Chọn file CSV:</label>
+            <input type="file" name="file" id="file" class="form-control" />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-file-import me-1"></i> Import
+        </button>
+        @Html.ActionLink("Quay lại danh sách", "Index", null, new { @class = "btn btn-secondary ms-2" })
+    }
+</div>

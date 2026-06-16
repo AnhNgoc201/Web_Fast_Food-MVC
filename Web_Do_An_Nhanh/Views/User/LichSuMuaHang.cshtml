@@ -1,0 +1,180 @@
+﻿@model List<Web_Do_An_Nhanh.Models.HoaDon>
+
+@{
+    ViewBag.Title = "Lịch Sử Mua Hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .text-jollibee-danger {
+        color: #dc3545 !important;
+    }
+
+    .bg-jollibee-primary {
+        background-color: #fcc200 !important;
+    }
+
+    .account-sidebar {
+        min-height: 100%;
+        border-radius: 0.5rem;
+        padding-top: 10px;
+    }
+
+    .sidebar-link {
+        display: block;
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #555;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .sidebar-link:hover {
+            background-color: #fff;
+            color: #dc3545;
+        }
+
+        .sidebar-link.active {
+            background-color: #fff;
+            color: #dc3545;
+            border-left: 5px solid #dc3545;
+            padding-left: calc(1.5rem - 5px);
+        }
+
+    .order-card {
+        border-radius: 0.5rem;
+        transition: transform 0.2s;
+        border: 1px solid #eee;
+    }
+
+        .order-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+        }
+</style>
+
+<div class="container py-5">
+    <div class="row g-5">
+
+        <div class="col-lg-3">
+            <div class="account-sidebar bg-jollibee-primary shadow">
+
+                <a href="@Url.Action("Index", "Profile")" class="sidebar-link">
+                    <i class="fas fa-user me-2"></i> QUẢN LÍ TÀI KHOẢN
+                </a>
+
+                <a href="@Url.Action("LichSuMuaHang", "User")" class="sidebar-link active">
+                    <i class="fas fa-history me-2"></i> ĐƠN HÀNG CỦA TÔI
+                </a>
+
+                <a href="@Url.Action("Logout", "User")" class="sidebar-link text-jollibee-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i> ĐĂNG XUẤT
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+
+            <h2 class="text-jollibee-danger fw-bolder mb-5">
+                <i class="fas fa-receipt me-2"></i> LỊCH SỬ MUA HÀNG
+            </h2>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info text-center p-4">
+                    <h4 class="alert-heading fw-bold">Chưa có đơn hàng nào!</h4>
+                    <p>Hãy bắt đầu đặt hàng Gà Giòn Vui Vẻ ngay hôm nay.</p>
+                    <a href="@Url.Action("Index", "SanPhams")" class="btn btn-warning fw-bold mt-2">ĐẶT HÀNG NGAY</a>
+                </div>
+            }
+            else
+            {
+                <div class="row g-4">
+                    @foreach (var don in Model)
+                    {
+                        <div class="col-md-6">
+                            <div class="card shadow-sm order-card h-100">
+
+                                <div class="card-header bg-jollibee-primary d-flex justify-content-between align-items-center fw-bold rounded-top-2">
+                                    <span class="text-dark">
+                                        <i class="fas fa-hashtag me-1"></i> ĐƠN HÀNG: @don.MaHD
+                                    </span>
+                                    <small class="text-secondary">
+                                        <i class="far fa-clock me-1"></i>
+                                        @(don.NgayLap.HasValue ? don.NgayLap.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")
+                                    </small>
+                                </div>
+
+                                <div class="card-body p-4">
+
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="fw-bold">TRẠNG THÁI:</span>
+                                        @{
+                                            string badgeClass = "bg-secondary text-white";
+                                            string statusText = don.TinhTrang?.TenTT ?? "Đang xử lý";
+
+                                            if (statusText.Contains("Đặt thành công"))
+                                            {
+                                                badgeClass = "bg-primary text-white";
+                                            }
+                                            else if (statusText.Contains("Chờ xác nhận"))
+                                            {
+                                                badgeClass = "bg-secondary text-white";   
+                                            }
+                                            else if (statusText.Contains("Đang làm món"))
+                                            {
+                                                badgeClass = "bg-info text-dark";
+                                            }
+                                            else if (statusText.Contains("Hoàn thành chế biến"))
+                                            {
+                                                badgeClass = "bg-success text-white";
+                                            }
+                                            else if (statusText.Contains("Đang vận chuyển") || statusText.Contains("Đang giao"))
+                                            {
+                                                badgeClass = "bg-primary text-white";
+                                            }
+                                            else if (statusText.Contains("Đã giao"))
+                                            {
+                                                badgeClass = "bg-success text-white";
+                                            }
+                                            else if (statusText.Contains("Hủy") || statusText.Contains("Đã hủy"))
+                                            {
+                                                badgeClass = "bg-danger text-white";
+                                            }
+                                        }
+
+
+                                        <span class="badge @badgeClass fs-6 p-2 shadow-sm">
+                                            @statusText
+                                        </span>
+                                    </div>
+
+                                    <p class="mb-1 border-bottom pb-2">
+                                        <i class="fas fa-money-bill-wave me-2 text-success"></i>
+                                        <strong>TỔNG THANH TOÁN:</strong>
+                                        <span class="float-end fw-bolder fs-5 text-jollibee-danger">
+                                            @string.Format("{0:N0} ₫", don.TongTien)
+                                        </span>
+                                    </p>
+
+
+                                    <p class="mb-3 pt-2 text-muted small">
+                                        <i class="fas fa-location-dot me-2"></i>
+                                        Địa chỉ giao hàng: @don.DiaChi
+                                    </p>
+
+                                    <div class="text-center">
+                                        <a href="@Url.Action("ChiTietDonHang", "Profile", new { id = don.MaHD })" class="btn btn-danger w-75 fw-bold">
+                                            <i class="fas fa-magnifying-glass me-2"></i> XEM CHI TIẾT
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

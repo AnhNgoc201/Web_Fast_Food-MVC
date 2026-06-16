@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title = "Quản Lý Tài Khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .bg-jollibee-primary {
+        background-color: #fcc200 !important;
+    }
+    .text-jollibee-danger {
+        color: #dc3545 !important;
+    }
+    .bg-jollibee-danger {
+        background-color: #dc3545 !important;
+    }
+
+    .account-sidebar {
+        min-height: 100%;
+        border-radius: 0.5rem;
+    }
+
+    .sidebar-link {
+        display: block;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #555;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+        .sidebar-link:hover {
+            background-color: #fff;
+            color: #dc3545; 
+        }
+        .sidebar-link.active {
+            background-color: #fff;
+            color: #dc3545;
+            border-left: 5px solid #dc3545;
+            padding-left: calc(1.5rem - 5px); 
+        }
+
+    .content-header {
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row g-5">
+
+        <div class="col-lg-3">
+            <div class="account-sidebar bg-jollibee-primary shadow">
+
+                <a href="@Url.Action("Index", "Profile")" class="sidebar-link active">
+                    <i class="fas fa-user me-2"></i> QUẢN LÍ TÀI KHOẢN
+                </a>
+
+                <a href="@Url.Action("LichSuMuaHang", "User")" class="sidebar-link ">
+                    <i class="fas fa-history me-2"></i> ĐƠN HÀNG CỦA TÔI
+                </a>
+                <a href="@Url.Action("Logout", "User")" class="sidebar-link text-jollibee-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i> ĐĂNG XUẤT
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+
+            <div class="mb-4">
+                <h1 class="text-jollibee-danger fw-bolder">QUẢN LÝ TÀI KHOẢN</h1>
+            </div>
+            <div class="mb-5">
+                <header class="content-header bg-jollibee-primary mb-3 shadow-sm d-flex justify-content-between align-items-center">
+                    <h3 class="fw-bold mb-0 text-dark">THÔNG TIN TÀI KHOẢN</h3>
+                </header>
+
+                <div class="p-3 border rounded-3 shadow-sm bg-white">
+                    <h5 class="fw-bold mb-3">THÔNG TIN LIÊN HỆ</h5>
+                    <p class="mb-1">@Model.TenKH</p>
+                    <p class="mb-1">@Model.Email</p>
+                    <p class="mb-1">@Model.SDT</p>
+                    <p class="mb-1">@Model.DiaChi</p>
+                    <a href="@Url.Action("Edit", "Profile")" class="text-decoration-none me-3">Chỉnh sửa</a>
+                    <a href="@Url.Action("Delete", "Profile", new { id = Model.MaKH })" class="text-decoration-none me-3">
+                        Xóa tài khoản
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,173 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.SanPham>
+
+@{
+    ViewBag.Title = "Tìm kiếm món ăn phù hợp";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool isSearched = !string.IsNullOrEmpty(ViewBag.Keyword as string) ||
+                      !string.IsNullOrEmpty(ViewBag.MaDM as string) ||
+                      ViewBag.GiaMin != null ||
+                      ViewBag.GiaMax != null ||
+                      !string.IsNullOrEmpty(ViewBag.Cay as string);
+}
+
+<style>
+    .text-jollibee-danger {
+        color: #dc3545 !important;
+    }
+    .bg-jollibee-primary {
+        background-color: #fcc200 !important;
+    }
+    .filter-card {
+        border-left: 5px solid #dc3545;
+        border-radius: 10px;
+    }
+
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+    .product-img {
+        height: 200px; 
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.05);
+    }
+</style>
+
+<div class="container py-5">
+
+    <h2 class="text-jollibee-danger fw-bolder mb-4">
+        <i class="fas fa-filter me-2"></i> TÌM KIẾM NÂNG CAO
+    </h2>
+
+    <div class="card shadow p-4 filter-card">
+        <form action="/SanPhams/TimKiemNangCao" method="get">
+
+            <div class="row g-4 align-items-end">
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold"><i class="fas fa-keyboard me-1"></i> Từ khóa</label>
+                    <input type="text" name="keyword" class="form-control form-control-lg" placeholder="Nhập tên món ăn..." value="@ViewBag.Keyword" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold"><i class="fas fa-list me-1"></i> Danh mục</label>
+                    <select name="MaDM" class="form-select form-select-lg">
+                        <option value="">Tất cả danh mục</option>
+                        @foreach (var dm in ViewBag.DanhMuc as List<Web_Do_An_Nhanh.Models.DanhMuc>)
+                        {
+                            <option value="@dm.MaDM" @(ViewBag.MaDM?.ToString() == dm.MaDM.ToString() ? "selected" : "")>@dm.TenDM</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Giá Min (VNĐ)</label>
+                    <input type="number" name="giaMin" class="form-control" placeholder="0" value="@ViewBag.GiaMin" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="form-label fw-bold">Giá Max (VNĐ)</label>
+                    <input type="number" name="giaMax" class="form-control" placeholder="500000" value="@ViewBag.GiaMax" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold"><i class="fas fa-pepper-hot me-1"></i> Mức độ cay</label>
+                    <select name="cay" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="1" @(ViewBag.Cay == "1" ? "selected" : "")>Có cay</option>
+                        <option value="0" @(ViewBag.Cay == "0" ? "selected" : "")>Không cay</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4 d-grid">
+                    <button class="btn btn-danger btn-lg fw-bold shadow-sm">
+                        <i class="fas fa-search me-2"></i> TÌM MÓN
+                    </button>
+                </div>
+                <div class="col-md-4 d-grid">
+                        <a href="@Url.Action("TimKiemNangCao", "SanPhams")" class="btn btn-warning btn-lg fw-bold shadow-sm">Xóa Bộ Lọc</a>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <hr class="my-5" />
+
+    @if (isSearched)
+    {
+        if (Model != null && Model.Any())
+        {
+            <h3 class="fw-bold text-dark mb-4">KẾT QUẢ TÌM KIẾM (@Model.Count())</h3>
+
+            <div class="row g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <a href="@Url.Action("Details", "SanPhams", new { id = item.MaSP })" class="product-card card h-100 shadow-sm border-0">
+
+                            <div class="product-image-container overflow-hidden position-relative">
+                                <img src="~/Content/Images/@item.HinhAnh"
+                                     class="card-img-top product-img"
+                                     alt="@item.TenSP">
+
+                                @if (item.TrangThai == true)
+                                {
+                                    <span class="badge bg-success position-absolute top-0 start-0 m-2">CÒN HÀNG</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary position-absolute top-0 start-0 m-2">HẾT HÀNG</span>
+                                }
+                            </div>
+
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-jollibee-danger fw-bold mb-1">@Html.DisplayFor(modelItem => item.TenSP)</h5>
+                                <p class="card-text text-muted small mb-2">@Html.DisplayFor(modelItem => item.DanhMuc.TenDM)</p>
+
+                                <p class="card-text small text-secondary flex-grow-1">
+                                    @(item.MoTa != null && item.MoTa.Length > 50 ? item.MoTa.Substring(0, 50) + "..." : item.MoTa)
+                                </p>
+                            </div>
+
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <p class="fs-5 fw-bolder text-dark mb-0">@string.Format("{0:N0} VNĐ", item.Gia)</p>
+                                    <button type="button" class="btn btn-sm btn-outline-danger disabled">
+                                        <i class="fas fa-eye me-1"></i> Xem Ngay  
+                                    </button>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning text-center p-4">
+                <h4 class="alert-heading fw-bold">Không tìm thấy món ăn nào.</h4>
+                <p>Rất tiếc, không có món ăn nào phù hợp với các tiêu chí bạn đã chọn. Vui lòng thử điều chỉnh lại bộ lọc.</p>
+                <a href="@Url.Action("TimKiemNangCao", "SanPhams")" class="btn btn-sm btn-warning mt-2">Xóa Bộ Lọc</a>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-info text-center p-4">
+            <h4 class="alert-heading fw-bold">Chào mừng bạn đến với công cụ tìm kiếm món ăn của Jollibee!</h4>
+            <p>Sử dụng các bộ lọc nâng cao phía trên để tìm ra món ăn hoàn hảo phù hợp với sở thích của bạn.</p>
+        </div>
+    }
+</div>

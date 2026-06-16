@@ -1,0 +1,50 @@
+﻿@model Web_Do_An_Nhanh.Models.NhanVien
+
+@{
+    ViewBag.Title = "Chi tiết nhân viên";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-id-badge"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Chi tiết nhân viên</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Mã nhân viên</dt>
+                <dd class="col-sm-9">@Model.MaNV</dd>
+
+                <dt class="col-sm-3">Họ tên</dt>
+                <dd class="col-sm-9 fw-semibold">@Model.TenNV</dd>
+
+                <dt class="col-sm-3">Vai trò</dt>
+                <dd class="col-sm-9">
+                    @(Model.VaiTro != null ? Model.VaiTro.TenVT : "")
+                </dd>
+
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.Email</dd>
+
+                <dt class="col-sm-3">Số điện thoại</dt>
+                <dd class="col-sm-9">@Model.SDT</dd>
+
+                <dt class="col-sm-3">Mật khẩu</dt>
+                <dd class="col-sm-9">@Model.MatKhau</dd>
+            </dl>
+
+            <div class="mt-4">
+                @Html.ActionLink("Sửa nhân viên", "Edit", new { id = Model.MaNV },
+                    new { @class = "btn btn-primary me-2" })
+                @Html.ActionLink("Quay lại danh sách", "Index", null,
+                    new { @class = "btn btn-secondary" })
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,167 @@
+﻿@using Web_Do_An_Nhanh.Models
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    var nv = Session["NhanVien"] as NhanVien;
+    bool laAdmin = nv != null && nv.MaVT == 1;   
+}
+
+
+<div class="container-fluid">
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "KhachHang")" class="text-decoration-none">
+                <div class="card shadow-sm border-0" style="background:#2563eb; color:white;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            <i class="fas fa-users me-2"></i>Khách hàng
+                        </h5>
+                        <p class="display-6 fw-bolder mb-0">@ViewBag.TongKhachHang</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        @if(laAdmin)
+        { 
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "NhanVien")" class="text-decoration-none">
+                <div class="card shadow-sm border-0" style="background:#16a34a; color:white;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            <i class="fas fa-user-tie me-2"></i>Nhân viên
+                        </h5>
+                        <p class="display-6 fw-bolder mb-0">@ViewBag.TongNhanVien</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "SanPhamAdmin")" class="text-decoration-none">
+                <div class="card shadow-sm border-0" style="background:#eab308; color:white;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            <i class="fas fa-burger me-2"></i>Sản phẩm
+                        </h5>
+                        <p class="display-6 fw-bolder mb-0">@ViewBag.TongSanPham</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        }
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "HoaDons")" class="text-decoration-none">
+                <div class="card shadow-sm border-0" style="background:#dc2626; color:white;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            <i class="fas fa-file-invoice-dollar me-2"></i>Đơn hàng
+                        </h5>
+                        <p class="display-6 fw-bolder mb-0">@ViewBag.TongHoaDon</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    @if(laAdmin)
+    {
+    <h3 class="text-center fw-bolder mb-4" style="color:#2563eb;">
+        <i class="fas fa-chart-line me-2"></i>BẢNG THỐNG KÊ DOANH THU
+    </h3>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Doanh thu theo tháng</h5>
+                    <canvas id="revenueChart" height="120"></canvas>
+                    <small class="text-muted">
+                        Đơn vị doanh thu: triệu VNĐ
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">Tỷ lệ sản phẩm bán chạy</h5>
+                    <canvas id="topProductChart" height="220"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var labels = @Html.Raw(ViewBag.ChartLabels);
+        var doanhThu = @Html.Raw(ViewBag.ChartDoanhThu);
+        var soDon = @Html.Raw(ViewBag.ChartSoDon);
+
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+
+        var revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Doanh thu (triệu)',
+                        data: doanhThu,
+                        borderWidth: 1
+                    },
+                    {
+                        type: 'line',
+                        label: 'Số đơn hàng',
+                        data: soDon,
+                        borderWidth: 2,
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Doanh thu (triệu)' }
+                    },
+                    y1: {
+                        beginAtZero: true,
+                        position: 'right',
+                        title: { display: true, text: 'Số đơn' },
+                        grid: { drawOnChartArea: false }
+                    }
+                }
+            }
+        });
+
+        var labelsTop = @Html.Raw(ViewBag.TopSpLabels);
+        var dataTop = @Html.Raw(ViewBag.TopSpData);
+
+        var ctx2 = document.getElementById('topProductChart').getContext('2d');
+
+        var topProductChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: labelsTop,
+                datasets: [{
+                    data: dataTop,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+}

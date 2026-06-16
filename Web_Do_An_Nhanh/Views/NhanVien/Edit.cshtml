@@ -1,0 +1,114 @@
+﻿@model Web_Do_An_Nhanh.Models.NhanVien
+
+@{
+    ViewBag.Title = "Chỉnh sửa nhân viên";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div id="clientErrorBox" class="alert alert-danger d-none"></div>
+
+<div class="container-fluid py-3">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:42px;height:42px;border-radius:50%;display:flex;
+             align-items:center;justify-content:center;background:#eff6ff;
+             color:#2563eb;font-size:1.3rem;margin-right:.75rem;">
+            <i class="fas fa-user-edit"></i>
+        </div>
+        <h3 class="fw-bold mb-0" style="color:#2563eb;">Chỉnh sửa nhân viên</h3>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.MaNV)
+                @Html.ValidationSummary(true, "", new { @class = "text-danger mb-3" })
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.TenNV, "Họ tên", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.TenNV,
+                                new { @class = "form-control", placeholder = "Nhập họ tên nhân viên...", @required = "required" })
+                            @Html.ValidationMessageFor(m => m.TenNV, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Vai trò</label>
+                            @Html.DropDownList(
+                                "MaVT",
+                                null,
+                                "-- Chọn vai trò --",
+                                new { @class = "form-select", @required = "required" }
+                            )
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Email, "Email", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.Email,
+                                new { @class = "form-control", placeholder = "Nhập email đăng nhập...", @required = "required" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.SDT, "Số điện thoại", new { @class = "form-label fw-semibold" })
+                            @Html.TextBoxFor(m => m.SDT,
+                                new { @class = "form-control", placeholder = "Nhập số điện thoại...", @required = "required" })
+                            @Html.ValidationMessageFor(m => m.SDT, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.MatKhau, "Mật khẩu", new { @class = "form-label fw-semibold" })
+                            @Html.PasswordFor(m => m.MatKhau,
+                                new { @class = "form-control", placeholder = "Nhập (hoặc đổi) mật khẩu...", })
+                            @Html.ValidationMessageFor(m => m.MatKhau, "", new { @class = "text-danger" })
+                            <small class="text-muted">
+                                Nếu không muốn đổi mật khẩu, hãy để trống ô này.
+                            </small>
+                        </div>
+
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Lưu thay đổi
+                </button>
+                @Html.ActionLink("Quay lại", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        (function () {
+            var form = document.querySelector("form");
+            if (!form) return;
+
+            form.addEventListener("submit", function (e) {
+                var requiredInputs = form.querySelectorAll("[data-required='1']");
+                for (var i = 0; i < requiredInputs.length; i++) {
+                    var el = requiredInputs[i];
+                    if (!el.value || !el.value.trim()) {
+                        e.preventDefault();
+
+                        var box = document.getElementById("clientErrorBox");
+                        if (box) {
+                            box.classList.remove("d-none");
+                            box.innerText = "Vui lòng nhập đầy đủ thông tin trước khi lưu.";
+                        }
+
+                        el.focus();
+                        return false;
+                    }
+                }
+            });
+        })();
+    </script>
+}

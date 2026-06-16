@@ -1,0 +1,201 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.NhanVien>
+
+@{
+    ViewBag.Title = "Quản lý nhân viên";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-3">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (TempData["ImportMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["ImportMessage"]
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="d-flex align-items-center">
+            <div style="width:42px;height:42px;border-radius:50%;
+                 display:inline-flex;align-items:center;justify-content:center;
+                 background:#eff6ff;color:#2563eb;margin-right:.75rem;font-size:1.3rem;">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h3 class="fw-bold mb-0" style="color:#2563eb;">
+                Quản lý nhân viên
+            </h3>
+        </div>
+
+        <div>
+            <a href="@Url.Action("Create")" class="btn btn-success fw-bold me-2">
+                <i class="fas fa-plus-circle me-1"></i> Thêm nhân viên mới
+            </a>
+
+            <a href="@Url.Action("Export", new { searchString = ViewBag.CurrentSearch, roleId = ViewBag.CurrentRoleId })"
+               class="btn btn-outline-secondary me-2">
+                <i class="fas fa-file-export me-1"></i> Xuất Excel
+            </a>
+
+            <a href="@Url.Action("Import")" class="btn btn-outline-primary">
+                <i class="fas fa-file-import me-1"></i> Import từ file
+            </a>
+        </div>
+    </div>
+
+    @using (Html.BeginForm("Index", "NhanVien", FormMethod.Get))
+    {
+        <div class="row mb-3">
+
+            <div class="col-md-4 mb-2">
+                <div class="input-group">
+                    @Html.TextBox("searchString",
+                        ViewBag.CurrentSearch as string,
+                        new { @class = "form-control", placeholder = "Tìm theo tên, email hoặc SDT..." })
+                    &nbsp;
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Tìm kiếm
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-2">
+                @Html.DropDownList(
+                    "roleId",
+                    (SelectList)ViewBag.Roles,
+                    "Tất cả vai trò",
+                    new { @class = "form-select", onchange = "this.form.submit();" })
+            </div>
+
+        </div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background-color: #fef3c7;">
+                    <tr class="fw-bold text-muted">
+                        <th style="width:60px;">#</th>
+                        <th>Họ tên</th>
+                        <th>Vai trò</th>
+                        <th>Email</th>
+                        <th>SDT</th>
+                        <th class="text-end" style="width:250px;">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @{
+                        int page = ViewBag.Page;
+                        int pageSize = ViewBag.PageSize;
+                        int totalItems = ViewBag.TotalItems;
+                        int stt = (page - 1) * pageSize;
+                    }
+
+                    @foreach (var nv in Model)
+                    {
+                        stt++;
+                        <tr>
+                            <td>@stt</td>
+                            <td class="fw-semibold">@nv.TenNV</td>
+                            <td>@(nv.VaiTro != null ? nv.VaiTro.TenVT : "")</td>
+                            <td>@nv.Email</td>
+                            <td>@nv.SDT</td>
+
+                            <td class="text-end">
+                                <a href="@Url.Action("Details", new { id = nv.MaNV })"
+                                   class="btn btn-sm btn-outline-secondary me-1">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+
+                                <a href="@Url.Action("Edit", new { id = nv.MaNV })"
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+
+                                <a href="@Url.Action("Delete", new { id = nv.MaNV })"
+                                   class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
+                                &nbsp;
+                                <br />
+                                <br />
+
+                                @if (nv.MatKhau != null && nv.MatKhau.StartsWith("KHOA_"))
+                                {
+                                    using (Html.BeginForm("MoKhoa", "NhanVien", new { id = nv.MaNV }, FormMethod.Post))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-success me-1">
+                                            <i class="fas fa-unlock"></i> Mở khóa
+                                        </button>
+                                    }
+                                }
+                                else
+                                {
+                                    <a href="@Url.Action("Khoa", new { id = nv.MaNV })"
+                                       class="btn btn-sm btn-warning me-1">
+                                        <i class="fas fa-lock"></i> Khóa
+                                    </a>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @{
+        int p = ViewBag.Page;
+        int ps = ViewBag.PageSize;
+        int total = ViewBag.TotalItems;
+        int totalPages = ViewBag.TotalPages;
+
+        int fromItem = total == 0 ? 0 : (p - 1) * ps + 1;
+        int toItem = total == 0 ? 0 : (p * ps > total ? total : p * ps);
+    }
+
+    <p class="text-muted mt-2">
+        Hiển thị @fromItem - @toItem trong tổng số @total nhân viên.
+    </p>
+
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(p == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = p - 1, searchString = ViewBag.CurrentSearch, roleId = ViewBag.CurrentRoleId })">«</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(p == i ? "active" : "")">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = i, searchString = ViewBag.CurrentSearch, roleId = ViewBag.CurrentRoleId })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(p == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new { page = p + 1, searchString = ViewBag.CurrentSearch, roleId = ViewBag.CurrentRoleId })">»</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

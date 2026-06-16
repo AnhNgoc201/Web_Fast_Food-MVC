@@ -1,0 +1,201 @@
+﻿@using Web_Do_An_Nhanh.Models
+
+@{
+    Layout = null;
+    var title = ViewBag.Title ?? "Admin Dashboard";
+    var nv = Session["NhanVien"] as NhanVien;
+    bool daDangNhap = nv != null;
+    bool laAdmin = daDangNhap && nv.MaVT == 1; 
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@title - Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 240px;
+            background-color: #1f2933;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .admin-sidebar .brand {
+                padding: 1.5rem 1.25rem;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+                .admin-sidebar .brand h4 {
+                    margin: 0;
+                    font-weight: 700;
+                    letter-spacing: 1px;
+                }
+
+                .admin-sidebar .brand small {
+                    font-size: 0.8rem;
+                    opacity: 0.8;
+                }
+
+            .admin-sidebar .nav-link {
+                color: #e5e7eb;
+                padding: .75rem 1.25rem;
+                display: flex;
+                align-items: center;
+                text-decoration: none;
+                font-weight: 500;
+                font-size: 0.95rem;
+                border-left: 3px solid transparent;
+                transition: all .2s ease;
+            }
+
+                .admin-sidebar .nav-link i {
+                    width: 20px;
+                    margin-right: .75rem;
+                }
+
+                .admin-sidebar .nav-link:hover {
+                    background-color: #111827;
+                    color: #fff;
+                }
+
+                .admin-sidebar .nav-link.active {
+                    background-color: #111827;
+                    border-left-color: #f97316;
+                    color: #fff;
+                }
+
+            .admin-sidebar .logout-link {
+                margin-top: auto;
+                padding-bottom: 1rem;
+            }
+
+        .admin-content {
+            flex: 1;
+            padding: 1.5rem 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <nav class="admin-sidebar">
+            <div class="brand">
+                <h4>ADMIN<br />DASHBOARD</h4>
+
+                @if (daDangNhap)
+                {
+                    <small>
+                        Xin chào: @nv.TenNV
+                        (@(laAdmin ? "Admin" : "Nhân viên"))
+                    </small>
+                }
+            </div>
+
+            <a href="@Url.Action("Index", "Admin")"
+               class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Admin" ? "active" : "")">
+                <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+
+            @if (laAdmin)
+            {
+                <a href="@Url.Action("Index", "KhachHang")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "KhachHang" ? "active" : "")">
+                    <i class="fas fa-users"></i> Quản lý khách hàng
+                </a>
+
+                <a href="@Url.Action("Index", "NhanVien")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "NhanVien" ? "active" : "")">
+                    <i class="fas fa-user-tie me-2"></i> Quản lý nhân viên
+                </a>
+
+                <a href="@Url.Action("Index", "DanhMucs")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "DanhMucs" ? "active" : "")">
+                    <i class="fas fa-layer-group"></i> Quản lý danh mục
+                </a>
+
+                <a href="@Url.Action("Index", "SanPhamAdmin")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "SanPhamAdmin" ? "active" : "")">
+                    <i class="fas fa-burger"></i> Quản lý sản phẩm
+                </a>
+
+                <a href="@Url.Action("Index", "KhuyenMais")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "KhuyenMais" ? "active" : "")">
+                    <i class="fas fa-tags"></i> Quản lý khuyến mãi
+                </a>
+
+                <a href="@Url.Action("Index", "HoaDons")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "HoaDons" ? "active" : "")">
+                    <i class="fas fa-file-invoice-dollar"></i> Quản lý hóa đơn
+                </a>
+
+                @*<a href="@Url.Action("Index", "ChiTietHoaDons")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "ChiTietHoaDons" ? "active" : "")">
+                    <i class="fas fa-list-ul"></i> Quản lý chi tiết hóa đơn
+                </a>*@
+            }
+            else if (daDangNhap)
+            {
+
+                <a href="@Url.Action("Index", "KhachHang")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "KhachHang" ? "active" : "")">
+                    <i class="fas fa-users"></i> Quản lý khách hàng
+                </a>
+
+                <a href="@Url.Action("Index", "HoaDons")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "HoaDons" ? "active" : "")">
+                    <i class="fas fa-file-invoice-dollar"></i> Quản lý hóa đơn
+                </a>
+
+                @*<a href="@Url.Action("Index", "ChiTietHoaDons")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "ChiTietHoaDons" ? "active" : "")">
+                    <i class="fas fa-list-ul"></i> Quản lý chi tiết hóa đơn
+                </a>*@
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "NhanVien")" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Đăng nhập nhân viên
+                </a>
+            }
+
+            <div class="logout-link">
+                @if (daDangNhap)
+                {
+                    <a href="@Url.Action("Logout", "NhanVien")" class="nav-link text-danger">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                }
+            </div>
+        </nav>
+
+        <main class="admin-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

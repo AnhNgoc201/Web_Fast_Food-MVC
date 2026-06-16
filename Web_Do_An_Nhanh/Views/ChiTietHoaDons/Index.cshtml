@@ -1,0 +1,72 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.ChiTietHoaDon>
+@{
+    ViewBag.Title = "Chi tiết hóa đơn";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+
+    int? maHD = ViewBag.MaHDDangXem as int?;
+    if (!maHD.HasValue && Model.Any())
+    {
+        maHD = Model.First().MaHD;
+    }
+}
+
+<div class="container py-4">
+    @*<div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-danger fw-bold">
+                CHI TIẾT HÓA ĐƠN @(maHD.HasValue ? "#" + maHD : "")
+            </h2>
+            <a href="@Url.Action("Create", new { maHD = maHD })" class="btn btn-danger">
+                <i class="fas fa-plus me-1"></i> Thêm Chi Tiết Hóa Đơn
+            </a>
+        </div>*@
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã HD</th>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-end">Thành tiền</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var ct in Model)
+                        {
+                            <tr>
+                                <td>@ct.MaHD</td>
+                                <td>@(ct.SanPham != null ? ct.SanPham.TenSP : "Sản phẩm đã xóa")</td>
+                                <td class="text-center">@ct.SoLuong</td>
+                                <td class="text-end">@string.Format("{0:N0} ₫", ct.DonGia)</td>
+                                <td class="text-end">@string.Format("{0:N0} ₫", ct.DonGia * ct.SoLuong)</td>
+                                <td class="text-end">
+                                    <a href="@Url.Action("Edit", new { maHD = ct.MaHD, maSP = ct.MaSP })"
+                                       class="btn btn-sm btn-outline-primary">Sửa</a>
+                                    <a href="@Url.Action("Delete", new { maHD = ct.MaHD, maSP = ct.MaSP })"
+                                       class="btn btn-sm btn-outline-danger ms-1">Xóa</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                Chưa có món nào trong hóa đơn này.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <a href="@Url.Action("Index","HoaDons")" class="btn btn-outline-secondary mt-3">
+        ← Quay lại danh sách hóa đơn
+    </a>
+</div>

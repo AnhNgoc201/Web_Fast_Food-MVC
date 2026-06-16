@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Web_Do_An_Nhanh.Models.TinhTrang>
+@{
+    ViewBag.Title = "Quản lý tình trạng đơn";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between mb-3 align-items-center">
+        <h2 class="text-danger fw-bold">TÌNH TRẠNG ĐƠN HÀNG</h2>
+        <a href="@Url.Action("Create")" class="btn btn-danger">
+            <i class="fas fa-plus me-1"></i> Thêm trạng thái
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <table class="table mb-0 table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã TT</th>
+                    <th>Tên trạng thái</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.MaTT</td>
+                        <td>@item.TenTT</td>
+                        <td class="text-end">
+                            <a href="@Url.Action("Edit", new { id = item.MaTT })" class="btn btn-sm btn-outline-primary">Sửa</a>
+                            <a href="@Url.Action("Delete", new { id = item.MaTT })" class="btn btn-sm btn-outline-danger ms-1">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
